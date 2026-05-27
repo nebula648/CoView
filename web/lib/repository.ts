@@ -337,6 +337,48 @@ export async function getEventsByContent(contentId: string): Promise<any[]> {
   );
 }
 
+export async function getRecentEvents(limit: number = 50): Promise<any[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select({
+          event: schema.events,
+          contentTitle: schema.contents.title,
+        })
+        .from(schema.events)
+        .leftJoin(schema.contents, eq(schema.events.contentId, schema.contents.id))
+        .orderBy(desc(schema.events.createdAt))
+        .limit(limit);
+      return rows.map((row: any) => ({
+        event_id: row.event.id,
+        content_id: row.event.contentId,
+        content_title: row.contentTitle ?? null,
+        event_type: row.event.eventType,
+        actor_type: row.event.actorType,
+        session_id: row.event.sessionId,
+        user_agent_hash: row.event.userAgentHash,
+        ip_hash: row.event.ipHash,
+        route_accessed: row.event.routeAccessed,
+        timestamp: row.event.createdAt
+          ? new Date(row.event.createdAt).toISOString().replace("T", " ").substring(0, 19)
+          : "",
+      }));
+    },
+    () => {
+      const contents = readContents();
+      const events = readEvents();
+      return events
+        .map(normalizeLegacyEvent)
+        .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, limit)
+        .map((e: any) => {
+          const c = contents.find((x: any) => x.id === e.content_id);
+          return { ...e, content_title: c?.title ?? null };
+        });
+    },
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Stats                                                               */
 /* ------------------------------------------------------------------ */
