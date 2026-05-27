@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/discover", label: "发现" },
   { href: "/upload", label: "上传" },
   { href: "/dashboard", label: "数据看板" },
+  { href: "/about", label: "关于 / About" },
 ];
 
 export function Sidebar() {

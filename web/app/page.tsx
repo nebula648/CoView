@@ -38,6 +38,13 @@ export default async function HomePage() {
               View Dashboard
               <span aria-hidden="true">→</span>
             </a>
+            <a
+              href="/about"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-500 px-5 py-2.5 text-sm font-medium text-slate-300 hover:border-white hover:text-white transition-colors"
+            >
+              About CoView
+              <span aria-hidden="true">→</span>
+            </a>
           </div>
         </div>
 
@@ -309,6 +316,12 @@ export default async function HomePage() {
             className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-white transition-colors"
           >
             Dashboard
+          </a>
+          <a
+            href="/about"
+            className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-white transition-colors"
+          >
+            About
           </a>
         </div>
       </section>
