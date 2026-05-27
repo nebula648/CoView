@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P4 上线后基础验收完成。
+P5-5 管理后台初版已完成，准备上线。
 
 ## 线上地址
 
@@ -118,6 +118,24 @@ P4 上线后基础验收完成。
 - 修改文件：`web/app/discover/page.tsx`、`web/components/content-card.tsx`
 - GitHub commit: a490775，Vercel 已部署上线
 
+### P5-4 内容详情页 Human Metrics / AI Metrics 优化
+
+- `/content/[slug]` 详情页完成双轨指标展示优化
+- Human Metrics 与 AI Metrics 分区更清晰
+- 增加 AI Summary、AI Value Score、Citation Suitability、AI Permissions、AI-Readable Entry 等展示区域
+- 最近事件区域展示当前内容相关事件
+- GitHub commit: 290ed9b，Vercel 已部署上线
+
+### P5-5 管理后台初版
+
+- 新增 `/admin` 管理后台首页
+- 新增 `/admin/contents` 内容管理列表
+- 新增 `/admin/events` 事件日志列表
+- 后台当前为 public demo，只读展示，无删除、编辑、修改数据库等危险操作
+- 后台顶部明确提示：Admin pages are currently public in this demo. Add authentication before production use.
+- 后台页面已添加 `noindex` / `nofollow`，避免搜索引擎索引 `/admin`、`/admin/contents`、`/admin/events`
+- 本地 commit: 62e0083，等待推送上线
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -133,8 +151,8 @@ P5：产品完善与安全整理（继续）。
 
 1. ~~优化首页文案和视觉结构~~ ✅
 2. ~~优化发现页内容卡片~~ ✅
-3. 优化内容详情页 Human Metrics / AI Metrics 展示
-4. 增加管理员后台或内容管理入口
+3. ~~优化内容详情页 Human Metrics / AI Metrics 展示~~ ✅
+4. ~~增加管理员后台或内容管理入口~~ ✅
 5. 优化事件日志 / 数据看板
 6. 增加正式使用说明
 7. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
@@ -142,7 +160,7 @@ P5：产品完善与安全整理（继续）。
 
 ## 下一阶段
 
-P5-4：内容详情页 Human Metrics / AI Metrics 优化。
+P5-6：事件日志和数据看板优化，或继续 P5-5 后续认证保护。
 
 ## 注意事项
 
