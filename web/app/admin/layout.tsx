@@ -18,14 +18,14 @@ const ADMIN_NAV = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="max-w-5xl">
-      {/* Demo warning */}
+      {/* Access gate notice */}
       <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 mb-6">
         <p className="text-xs text-amber-700 font-medium">
-          Admin pages are currently public in this demo. Add authentication before
-          production use.
+          Admin pages are protected by a lightweight demo access gate. Add full
+          authentication before production use.
         </p>
         <p className="text-xs text-amber-600 mt-1">
-          当前管理页面为公开 Demo。正式使用前请加入身份认证。
+          当前管理页面已使用轻量访问码保护。正式生产使用前仍应加入完整身份认证。
         </p>
       </div>
 
