@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P1 数据库接入与稳定化已完成，下一步可进入 P2：数据库实测与部署准备。
+P2 数据库实测已完成。
 
 ## 技术栈
 
@@ -58,22 +58,31 @@ P1 数据库接入与稳定化已完成，下一步可进入 P2：数据库实�
 
 ## 最新验证
 
+- Supabase PostgreSQL 连接成功
+- migration 成功
+- seed 成功
+- 页面可读取数据库内容
+- `/discover` 正常
+- `/dashboard` 正常
+- `/content/{slug}` 正常
+- `human_view` 可以写入数据库
+- GPTBot 访问 `/api/contents/{slug}.json` 可以记录 `ai_agent_view`
+- Googlebot 访问会记录 `search_crawler_view`，且不增加 AI Views
 - `npm run lint` 通过
 - `npm run build` 通过
 
 ## 下一步建议
 
-P2：数据库实测与部署准备。
+P3：Vercel 部署准备与上线。
 
 具体包括：
 
-- 使用 Docker / Supabase / Neon 启动真实 PostgreSQL
-- 配置 `web/.env.local` 中的 `DATABASE_URL`
-- 运行 `npx tsx db/migrate.ts`
-- 运行 `npx tsx db/seed.ts`
-- 验证页面从数据库读取 metrics
-- 验证 `human_view`、`ai_agent_view` 写入数据库并去重
-- 准备 Vercel 部署配置
+- 确认 Vercel 项目根目录使用 `web/`
+- 配置 Vercel 环境变量：`DATABASE_URL`、`NEXT_PUBLIC_SITE_URL`
+- 确认 build command 为 `npm run build`
+- 部署后验证 `/llms.txt`、`/robots.txt`、`/sitemap.xml`
+- 部署后验证 `/api/ai-index.json` 与 `/api/contents/{slug}.json`
+- 部署后验证 `human_view`、`ai_agent_view`、`search_crawler_view` 事件写入
 
 ## 注意事项
 
