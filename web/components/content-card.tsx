@@ -162,7 +162,7 @@ export function ContentCard({
           <PermissionBadge allowed={allowAiView} label="View" />
           <PermissionBadge allowed={allowAiSave} label="Save" />
           <PermissionBadge allowed={allowAiCite} label="Cite" />
-          <PermissionBadge allowed={allowAiRecommend} label="Rec" />
+          <PermissionBadge allowed={allowAiRecommend} label="Recommend" />
         </div>
 
         <div className="flex items-center gap-2">

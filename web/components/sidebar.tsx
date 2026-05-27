@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { href: "/", label: "首页" },
-  { href: "/discover", label: "发现" },
-  { href: "/upload", label: "上传" },
-  { href: "/dashboard", label: "数据看板" },
-  { href: "/about", label: "关于 / About" },
+  { href: "/", label: "Home / 首页" },
+  { href: "/discover", label: "Discover / 发现" },
+  { href: "/upload", label: "Upload / 上传" },
+  { href: "/dashboard", label: "Dashboard / 数据看板" },
+  { href: "/about", label: "About / 关于" },
 ];
 
 export function Sidebar() {

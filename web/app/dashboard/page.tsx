@@ -135,23 +135,23 @@ export default async function DashboardPage() {
   const avgAiViews = contents.length ? totalAiViews / contents.length : 0;
 
   const groups = {
-    "双高内容": [] as any[],
-    "人类热门内容": [] as any[],
-    "AI 价值内容": [] as any[],
-    "低活跃内容": [] as any[],
+    "High Engagement / 高活跃": [] as any[],
+    "Human Favorites / 人类热门": [] as any[],
+    "AI Valued / AI 价值": [] as any[],
+    "Low Activity / 低活跃": [] as any[],
   };
 
   for (const content of contents) {
     const humanViews = content.metrics?.human_views ?? 0;
     const aiViews = content.metrics?.ai_views ?? 0;
     if (humanViews >= avgHumanViews && aiViews >= avgAiViews) {
-      groups["双高内容"].push(content);
+      groups["High Engagement / 高活跃"].push(content);
     } else if (humanViews >= avgHumanViews) {
-      groups["人类热门内容"].push(content);
+      groups["Human Favorites / 人类热门"].push(content);
     } else if (aiViews >= avgAiViews) {
-      groups["AI 价值内容"].push(content);
+      groups["AI Valued / AI 价值"].push(content);
     } else {
-      groups["低活跃内容"].push(content);
+      groups["Low Activity / 低活跃"].push(content);
     }
   }
 
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <h1 className="mb-2 text-3xl font-bold text-slate-900">数据看板</h1>
+      <h1 className="mb-2 text-3xl font-bold text-slate-900">Dashboard / 数据看板</h1>
       <p className="mb-6 text-sm text-slate-500">
         CoView tracks human attention, AI agent access, crawler traffic, and
         unknown bot behavior separately.
@@ -290,10 +290,10 @@ export default async function DashboardPage() {
 
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold text-slate-800">
-          Human vs AI 内容类型判断
+          Content Categories / 内容分类
         </h2>
         <p className="mb-3 text-xs text-slate-500">
-          平均 Human Views: {avgHumanViews.toFixed(1)}；平均 AI Views:{" "}
+          Avg Human Views: {avgHumanViews.toFixed(1)} · Avg AI Views:{" "}
           {avgAiViews.toFixed(1)}
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -303,7 +303,7 @@ export default async function DashboardPage() {
                 {name}
               </h3>
               {items.length === 0 ? (
-                <p className="text-xs text-slate-400">暂无内容。</p>
+                <p className="text-xs text-slate-400">No content yet.</p>
               ) : (
                 items.map((content: any) => (
                   <div key={content.id} className="mb-1 text-xs text-slate-600">
@@ -322,11 +322,11 @@ export default async function DashboardPage() {
           AI Permission Overview
         </h2>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-          <MetricCard label="允许 AI 浏览" value={permissionCounts.allowView} />
-          <MetricCard label="允许 AI 引用" value={permissionCounts.allowCite} />
-          <MetricCard label="禁止 AI 引用" value={permissionCounts.forbidCite} />
-          <MetricCard label="禁止 AI 推荐" value={permissionCounts.forbidRec} />
-          <MetricCard label="允许 AI 评论" value={permissionCounts.allowComment} />
+          <MetricCard label="Allow AI View" value={permissionCounts.allowView} />
+          <MetricCard label="Allow AI Cite" value={permissionCounts.allowCite} />
+          <MetricCard label="Forbid AI Cite" value={permissionCounts.forbidCite} />
+          <MetricCard label="Forbid AI Rec" value={permissionCounts.forbidRec} />
+          <MetricCard label="Allow AI Comment" value={permissionCounts.allowComment} />
         </div>
       </section>
     </div>

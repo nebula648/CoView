@@ -163,7 +163,7 @@ export default async function HomePage() {
             <div className="text-xl font-bold text-slate-700">
               {stats.allowAiViewCount}
             </div>
-            <div className="text-xs text-slate-500">允许 AI 浏览</div>
+            <div className="text-xs text-slate-500">Allow AI View / 允许 AI 浏览</div>
           </div>
           <div className="rounded-lg border bg-slate-50 p-4 text-center">
             <div className="text-xl font-bold text-slate-700">
@@ -303,25 +303,25 @@ export default async function HomePage() {
             href="/discover"
             className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 transition-colors"
           >
-            Discover
+            Explore Content
           </a>
           <a
             href="/upload"
             className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-white transition-colors"
           >
-            Upload
+            Upload Content
           </a>
           <a
             href="/dashboard"
             className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-white transition-colors"
           >
-            Dashboard
+            View Dashboard
           </a>
           <a
             href="/about"
             className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-white transition-colors"
           >
-            About
+            About CoView
           </a>
         </div>
       </section>

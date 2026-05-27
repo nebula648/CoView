@@ -245,7 +245,7 @@ export default async function ContentDetailPage({
               <MetricBlock value={m.ai_citations ?? 0} label="Citations" />
               <MetricBlock
                 value={content.ai_recommendations ?? m.ai_recommendations ?? 0}
-                label="Recs"
+                label="Recommends"
               />
             </div>
           </div>
