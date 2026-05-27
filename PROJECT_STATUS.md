@@ -2,7 +2,11 @@
 
 ## 当前阶段
 
-P2 数据库实测已完成。
+P4 上线后基础验收完成。
+
+## 线上地址
+
+`https://coview-web.vercel.app`
 
 ## 技术栈
 
@@ -10,8 +14,9 @@ P2 数据库实测已完成。
 - TypeScript
 - TailwindCSS
 - Drizzle ORM
-- PostgreSQL / Supabase-ready
+- PostgreSQL / Supabase
 - JSON fallback 数据源
+- Vercel 部署
 
 ## 项目结构说明
 
@@ -48,41 +53,96 @@ P2 数据库实测已完成。
   - AI Agent: `ua_hash + ip_hash + content_id`
 - 事件命名统一为 `actor_type = "ai_agent"`、`event_type = "ai_agent_view"`，并兼容旧 JSON 的 `ai` / `ai_view`
 
-## 最新稳定化修复
-
-- 修复 DB 模式下列表页与 Dashboard 读取不到 metrics 的问题
-- 内容详情页新增 human_view 客户端上报
-- JSON fallback 的 `createEvent()` 保留 `extraFields`
-- 旧 JSON 事件读取兼容 `ai` / `ai_view` 命名
-- 文档同步到 Next.js 正式站结构
-
-## 最新验证
+### P2 数据库实测
 
 - Supabase PostgreSQL 连接成功
 - migration 成功
 - seed 成功
 - 页面可读取数据库内容
-- `/discover` 正常
-- `/dashboard` 正常
-- `/content/{slug}` 正常
-- `human_view` 可以写入数据库
-- GPTBot 访问 `/api/contents/{slug}.json` 可以记录 `ai_agent_view`
-- Googlebot 访问会记录 `search_crawler_view`，且不增加 AI Views
-- `npm run lint` 通过
-- `npm run build` 通过
+- human_view 可以写入数据库
+- GPTBot 访问可以记录 ai_agent_view
+- Googlebot 访问记录 search_crawler_view，且不增加 AI Views
+
+### P3 Vercel 部署上线
+
+- GitHub 仓库 `nebula648/CoView` main 分支已部署
+- Supabase 数据库已连接
+- Vercel 项目 `coview-web` 部署成功
+- 正式域名 `https://coview-web.vercel.app` 可访问
+- Root Directory 设置为 `web`
+- Framework Preset 为 Next.js
+- Output Directory Override 已关闭
+
+### P4 上线后基础验收
+
+- `/` 可访问
+- `/discover` 可访问
+- `/dashboard` 可访问
+- `/content/seed-coview-001` 可访问
+- `/llms.txt` 可访问
+- `/robots.txt` 可访问
+- `/sitemap.xml` 可访问
+- `/api/ai-index.json` 可访问
+- `/api/contents/seed-coview-001.json` 可访问
+- Supabase events 表可查看
+- events 表中已有 human_view 记录
+- events 表中已有 ai_agent_view 记录
+
+### P5-1 安全整理
+
+- GitHub 仓库安全扫描通过，无真实密钥、密码、token 泄露
+- 根目录 `.gitignore` 已追加 `.env.*` 规则
+- `.env.local` 未被提交到 Git
+- `DATABASE_URL` 未硬编码在代码中
+
+### P5-2 首页优化
+
+- 首页全新 7 段结构：Hero、Dual-Track Metrics、Why CoView、How It Works、AI Entry Points、Current Demo、CTA
+- Hero 渐变背景 + 双语标题/标语 + 双 CTA 按钮 + 实时统计数据卡片
+- 4 张核心概念卡片（Human Views、AI Views、AI-Readable Content、Permission-Aware Access）
+- 5 步工作流程展示
+- 5 个 AI 入口路径展示
+- 8 个当前能力标签
+- GitHub commit: 7e57622，Vercel 已部署上线
+
+### P5-3 发现页内容卡片优化
+
+- `/discover` 页面顶部新增标题区：标题 "Discover Content"、副标题、中英双语说明
+- 内容卡片全面重写，每条展示：
+  - 标题、摘要（优先 `ai_summary`，fallback body 截取）、tags、创建日期
+  - Human Metrics 区域（Views、Likes、Saves）
+  - AI Metrics 区域（Views、Saves、Citations、Recommends）
+  - 4 个 AI 权限 badge（View / Save / Cite / Rec，Allowed 绿色 / Blocked 红色）
+  - 双 CTA 按钮：Read Details → `/content/{slug}`、AI JSON → `/api/contents/{slug}.json`
+- 空状态：文件图标 + "No content yet" 提示 + "Upload Content" 按钮
+- 修改文件：`web/app/discover/page.tsx`、`web/components/content-card.tsx`
+- GitHub commit: a490775，Vercel 已部署上线
+
+## 最新构建与部署状态
+
+- TypeScript 通过
+- ESLint 0 错误 0 警告
+- Next.js build 成功
+- Vercel 部署状态 Ready
 
 ## 下一步建议
 
-P3：Vercel 部署准备与上线。
+P5：产品完善与安全整理（继续）。
 
-具体包括：
+剩余任务：
 
-- 确认 Vercel 项目根目录使用 `web/`
-- 配置 Vercel 环境变量：`DATABASE_URL`、`NEXT_PUBLIC_SITE_URL`
-- 确认 build command 为 `npm run build`
-- 部署后验证 `/llms.txt`、`/robots.txt`、`/sitemap.xml`
-- 部署后验证 `/api/ai-index.json` 与 `/api/contents/{slug}.json`
-- 部署后验证 `human_view`、`ai_agent_view`、`search_crawler_view` 事件写入
+1. ~~优化首页文案和视觉结构~~ ✅
+2. ~~优化发现页内容卡片~~ ✅
+3. 优化内容详情页 Human Metrics / AI Metrics 展示
+4. 增加管理员后台或内容管理入口
+5. 优化事件日志 / 数据看板
+6. 增加正式使用说明
+7. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
+8. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+
+## 下一阶段
+
+P5-4：内容详情页 Human Metrics / AI Metrics 优化。
 
 ## 注意事项
 
