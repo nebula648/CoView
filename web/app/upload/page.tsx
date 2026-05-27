@@ -42,7 +42,7 @@ const PERMISSIONS = [
   {
     key: "comment",
     title: "Allow AI Comment",
-    description: "Allow AI agents to leave clearly labeled AI comments on this content.",
+    description: "允许 AI 在此内容下发表评论",
   },
 ] as const;
 
