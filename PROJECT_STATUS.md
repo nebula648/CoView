@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P6-6 About / Product Explanation 页面完成并上线。
+P6-8 产品文案规范与中英双语统一整理完成并上线。
 
 ## 线上地址
 
@@ -274,6 +274,27 @@ P6-6 About / Product Explanation 页面完成并上线。
 - 不涉及正式登录系统
 - 不涉及上传、评论、后台业务逻辑修改
 
+### P6-7 产品视觉与中英双语统一整理
+
+- GitHub commit: 588959d Polish bilingual UI copy and visual consistency
+- 侧边栏导航标签统一为 English / Chinese 双语格式
+- Dashboard 标题、内容分类组名、权限标签统一为 English / Chinese
+- 首页 CTA 按钮和统计标签统一
+- 权限 badge `Rec` → `Recommend`，指标标签 `Recs` → `Recommends`
+- 5 个文件改动，无业务逻辑修改
+
+### P6-8 UI Copy Style Guide + Bilingual Polish
+
+- GitHub commit: 9d5755f Add UI copy style guide and bilingual polish
+- 新增 `docs/UI_COPY_STYLE_GUIDE.md` — CoView 产品文案规范文档
+- 全站页面标题统一为 `English / Chinese` 格式
+- 全站主要模块标题统一为 `English / Chinese` 格式
+- 按钮保持英文为主，`AI JSON` → `Open AI JSON`
+- Admin demo warning 新增中文提示
+- 评论区标题统一为 `Discussion / 评论区`
+- 14 个文件改动，零业务逻辑修改
+- lint/build 通过，Vercel 已部署
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -283,7 +304,7 @@ P6-6 About / Product Explanation 页面完成并上线。
 
 ## 下一步建议
 
-P6：轻量身份与互动系统。
+P5-P6：产品完善与轻量互动系统。
 
 剩余任务：
 
@@ -298,13 +319,15 @@ P6：轻量身份与互动系统。
 9. ~~评论区体验优化~~ ✅
 10. ~~管理后台评论查看与审核预留~~ ✅
 11. ~~About / Product Explanation 页面~~ ✅
-12. 增加正式使用说明
-13. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
-14. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+12. ~~产品视觉与中英双语统一整理~~ ✅
+13. ~~UI Copy Style Guide + Bilingual Polish~~ ✅
+14. 增加正式使用说明
+15. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
+16. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P6-7：管理后台认证保护规划，或产品视觉与中英双语统一整理。
+P6-9：产品收尾与公开演示准备，或管理后台认证保护规划。
 
 ## 注意事项
 
