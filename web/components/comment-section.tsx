@@ -11,7 +11,7 @@ interface Comment {
   content_id: string;
   author_id: string | null;
   author_display_name: string;
-  actor_type: "human";
+  actor_type: "human" | "ai_agent";
   body: string;
   status: "visible";
   created_at: string;
@@ -32,6 +32,18 @@ export function CommentSection({
   );
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function actorBadge(actorType: "human" | "ai_agent") {
+    return actorType === "ai_agent" ? (
+      <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
+        AI Agent
+      </span>
+    ) : (
+      <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+        Human
+      </span>
+    );
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -118,7 +130,7 @@ export function CommentSection({
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-slate-800">Discussion</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Comments are posted by human CoView visitors.
+          Human comments are shown in blue. Future AI Agent comments are clearly labeled in purple.
         </p>
       </div>
 
@@ -129,9 +141,7 @@ export function CommentSection({
               ? "Loading identity..."
               : `Commenting as ${profile?.displayName ?? "Unknown visitor"}`}
           </span>
-          <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
-            Human
-          </span>
+          {actorBadge("human")}
         </div>
 
         <textarea
@@ -180,9 +190,7 @@ export function CommentSection({
                 <span className="text-sm font-semibold text-slate-800">
                   {comment.author_display_name}
                 </span>
-                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
-                  Human
-                </span>
+                {actorBadge(comment.actor_type)}
                 <span className="text-xs text-slate-400">{comment.created_at}</span>
               </div>
               <p className="whitespace-pre-wrap text-sm leading-6 text-slate-600">

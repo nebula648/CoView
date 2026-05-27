@@ -41,6 +41,7 @@ export const contents = pgTable("contents", {
   allowAiSave: boolean("allow_ai_save").default(true).notNull(),
   allowAiCite: boolean("allow_ai_cite").default(true).notNull(),
   allowAiRecommend: boolean("allow_ai_recommend").default(true).notNull(),
+  allowAiComment: boolean("allow_ai_comment").default(false).notNull(),
 });
 
 export const contentMetrics = pgTable("content_metrics", {

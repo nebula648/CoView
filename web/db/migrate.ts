@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS contents (
   allow_ai_view BOOLEAN DEFAULT true NOT NULL,
   allow_ai_save BOOLEAN DEFAULT true NOT NULL,
   allow_ai_cite BOOLEAN DEFAULT true NOT NULL,
-  allow_ai_recommend BOOLEAN DEFAULT true NOT NULL
+  allow_ai_recommend BOOLEAN DEFAULT true NOT NULL,
+  allow_ai_comment BOOLEAN DEFAULT false NOT NULL
 );
 
 ALTER TABLE contents
@@ -47,9 +48,16 @@ ALTER TABLE contents
 ALTER TABLE contents
   ADD COLUMN IF NOT EXISTS author_display_name TEXT DEFAULT 'CoView Demo Author' NOT NULL;
 
+ALTER TABLE contents
+  ADD COLUMN IF NOT EXISTS allow_ai_comment BOOLEAN DEFAULT false NOT NULL;
+
 UPDATE contents
 SET author_display_name = 'CoView Demo Author'
 WHERE author_display_name IS NULL OR author_display_name = '';
+
+UPDATE contents
+SET allow_ai_comment = false
+WHERE allow_ai_comment IS NULL;
 
 CREATE TABLE IF NOT EXISTS content_metrics (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

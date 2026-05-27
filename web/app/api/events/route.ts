@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
       allowAiSave,
       allowAiCite,
       allowAiRecommend,
+      allowAiComment,
     } = body;
     if (!title?.trim() || !bodyText?.trim()) {
       return NextResponse.json({ error: "Title and body are required" }, { status: 400 });
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
       allowAiSave: allowAiSave ?? true,
       allowAiCite: allowAiCite ?? true,
       allowAiRecommend: allowAiRecommend ?? true,
+      allowAiComment: allowAiComment ?? false,
     });
     return NextResponse.json({ success: true, id: result.id });
   }

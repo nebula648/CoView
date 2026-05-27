@@ -39,6 +39,11 @@ const PERMISSIONS = [
     title: "Allow AI Recommend",
     description: "允许 AI 推荐内容",
   },
+  {
+    key: "comment",
+    title: "Allow AI Comment",
+    description: "Allow AI agents to leave clearly labeled AI comments on this content.",
+  },
 ] as const;
 
 export default function UploadPage() {
@@ -49,6 +54,7 @@ export default function UploadPage() {
   const [allowAiSave, setAllowAiSave] = useState(true);
   const [allowAiCite, setAllowAiCite] = useState(true);
   const [allowAiRecommend, setAllowAiRecommend] = useState(true);
+  const [allowAiComment, setAllowAiComment] = useState(false);
   const [status, setStatus] = useState<Status | null>(null);
   const [profile, setProfile] = useState<VisitorProfile | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -124,6 +130,7 @@ export default function UploadPage() {
         allowAiSave,
         allowAiCite,
         allowAiRecommend,
+        allowAiComment,
       }),
     });
 
@@ -144,6 +151,7 @@ export default function UploadPage() {
       setAllowAiSave(true);
       setAllowAiCite(true);
       setAllowAiRecommend(true);
+      setAllowAiComment(false);
     } else {
       setStatus({
         type: "error",
@@ -156,6 +164,7 @@ export default function UploadPage() {
     if (key === "view") return allowAiView;
     if (key === "save") return allowAiSave;
     if (key === "cite") return allowAiCite;
+    if (key === "comment") return allowAiComment;
     return allowAiRecommend;
   }
 
@@ -166,6 +175,7 @@ export default function UploadPage() {
     if (key === "view") setAllowAiView(checked);
     else if (key === "save") setAllowAiSave(checked);
     else if (key === "cite") setAllowAiCite(checked);
+    else if (key === "comment") setAllowAiComment(checked);
     else setAllowAiRecommend(checked);
   }
 

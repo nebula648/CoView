@@ -100,6 +100,7 @@ async function main() {
         allowAiSave: c.allow_ai_save ?? true,
         allowAiCite: c.allow_ai_cite ?? true,
         allowAiRecommend: c.allow_ai_recommend ?? true,
+        allowAiComment: c.allow_ai_comment ?? false,
       });
 
       const m = c.metrics ?? {};

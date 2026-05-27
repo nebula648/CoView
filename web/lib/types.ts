@@ -5,6 +5,7 @@ export type EventType =
   | "human_like"
   | "human_save"
   | "human_comment"
+  | "ai_agent_comment"
   | "ai_agent_view"
   | "ai_agent_save"
   | "ai_agent_cite"
@@ -21,7 +22,7 @@ export interface Comment {
   content_id: string;
   author_id: string | null;
   author_display_name: string;
-  actor_type: "human";
+  actor_type: "human" | "ai_agent";
   body: string;
   status: "visible";
   created_at: string;
@@ -41,6 +42,7 @@ export interface AiReadableContent {
   "coView:title": string;
   "coView:body": string;
   "coView:originalTags": string[];
+  "coView:allowAiComment": boolean;
   "coView:aiAnalysis": {
     summary: string | null;
     tags: string[];
@@ -57,6 +59,7 @@ export interface AiReadableContent {
     canAiSave: boolean;
     canAiCite: boolean;
     canAiRecommend: boolean;
+    canAiComment: boolean;
   };
 }
 

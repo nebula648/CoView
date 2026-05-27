@@ -264,6 +264,7 @@ export default async function ContentDetailPage({
           <PermissionBadge label="Save" allowed={content.allow_ai_save ?? true} />
           <PermissionBadge label="Cite" allowed={content.allow_ai_cite ?? true} />
           <PermissionBadge label="Recommend" allowed={content.allow_ai_recommend ?? true} />
+          <PermissionBadge label="Comment" allowed={content.allow_ai_comment ?? false} />
         </div>
       </section>
 

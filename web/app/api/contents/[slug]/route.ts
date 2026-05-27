@@ -54,6 +54,7 @@ export async function GET(
     "coView:title": content.title,
     "coView:body": content.body,
     "coView:originalTags": content.tags ?? [],
+    "coView:allowAiComment": content.allow_ai_comment ?? false,
     "coView:aiAnalysis": {
       summary: content.ai_summary ?? null,
       tags: content.ai_tags ?? [],
@@ -79,6 +80,7 @@ export async function GET(
       canAiSave: content.allow_ai_save ?? true,
       canAiCite: content.allow_ai_cite ?? true,
       canAiRecommend: content.allow_ai_recommend ?? true,
+      canAiComment: content.allow_ai_comment ?? false,
     },
   };
 

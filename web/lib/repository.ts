@@ -167,6 +167,7 @@ export async function createContent(payload: {
   allowAiSave: boolean;
   allowAiCite: boolean;
   allowAiRecommend: boolean;
+  allowAiComment?: boolean;
 }): Promise<{ id: string }> {
   const db = getDB();
   if (db) {
@@ -185,6 +186,7 @@ export async function createContent(payload: {
         allowAiSave: payload.allowAiSave,
         allowAiCite: payload.allowAiCite,
         allowAiRecommend: payload.allowAiRecommend,
+        allowAiComment: payload.allowAiComment ?? false,
       });
       await db.insert(schema.contentMetrics).values({ contentId: id });
       return { id };
@@ -213,6 +215,7 @@ export async function createContent(payload: {
     allow_ai_save: payload.allowAiSave,
     allow_ai_cite: payload.allowAiCite,
     allow_ai_recommend: payload.allowAiRecommend,
+    allow_ai_comment: payload.allowAiComment ?? false,
   };
   contents.unshift(newContent);
   writeContents(contents);
@@ -452,9 +455,11 @@ export async function createComment(payload: {
   authorId?: string | null;
   authorDisplayName: string;
   body: string;
+  actorType?: "human" | "ai_agent";
 }): Promise<any> {
   const commentBody = payload.body.trim();
   const authorDisplayName = payload.authorDisplayName.trim() || DEFAULT_AUTHOR_NAME;
+  const actorType = payload.actorType ?? "human";
   const db = getDB();
 
   if (db) {
@@ -465,7 +470,7 @@ export async function createComment(payload: {
           contentId: payload.contentId,
           authorId: payload.authorId ?? null,
           authorDisplayName,
-          actorType: "human",
+          actorType,
           body: commentBody,
           status: "visible",
         })
@@ -474,8 +479,8 @@ export async function createComment(payload: {
       const comment = mapDBComment(inserted[0]);
       await createEvent({
         contentId: payload.contentId,
-        eventType: "human_comment",
-        actorType: "human",
+        eventType: actorType === "ai_agent" ? "ai_agent_comment" : "human_comment",
+        actorType,
         extraFields: {
           author_id: payload.authorId ?? null,
           author_display_name: authorDisplayName,
@@ -493,7 +498,7 @@ export async function createComment(payload: {
     content_id: payload.contentId,
     author_id: payload.authorId ?? null,
     author_display_name: authorDisplayName,
-    actor_type: "human",
+    actor_type: actorType,
     body: commentBody,
     status: "visible",
     created_at: now,
@@ -503,8 +508,8 @@ export async function createComment(payload: {
 
   await createEvent({
     contentId: payload.contentId,
-    eventType: "human_comment",
-    actorType: "human",
+    eventType: actorType === "ai_agent" ? "ai_agent_comment" : "human_comment",
+    actorType,
     extraFields: {
       author_id: payload.authorId ?? null,
       author_display_name: authorDisplayName,
@@ -915,6 +920,7 @@ function mapDBContent(row: any): any {
     allow_ai_save: row.allowAiSave,
     allow_ai_cite: row.allowAiCite,
     allow_ai_recommend: row.allowAiRecommend,
+    allow_ai_comment: row.allowAiComment ?? false,
   };
 }
 
@@ -954,6 +960,7 @@ function ensureLegacyShape(c: any): any {
     ai_value_score: c.ai_value_score ?? 0,
     ai_reason: c.ai_reason ?? "尚未生成 AI Reason。",
     ai_recommendations: c.ai_recommendations ?? c.metrics?.ai_recommendations ?? 0,
+    allow_ai_comment: c.allow_ai_comment ?? false,
   };
 }
 
@@ -978,7 +985,7 @@ function mapDBComment(row: any): any {
     content_id: row.contentId,
     author_id: row.authorId ?? null,
     author_display_name: row.authorDisplayName,
-    actor_type: row.actorType,
+    actor_type: row.actorType === "ai_agent" ? "ai_agent" : "human",
     body: row.body,
     status: row.status,
     created_at: row.createdAt
@@ -993,7 +1000,7 @@ function ensureCommentShape(comment: any): any {
     content_id: comment.content_id,
     author_id: comment.author_id ?? null,
     author_display_name: comment.author_display_name ?? DEFAULT_AUTHOR_NAME,
-    actor_type: "human",
+    actor_type: comment.actor_type === "ai_agent" ? "ai_agent" : "human",
     body: comment.body ?? "",
     status: comment.status ?? "visible",
     created_at:

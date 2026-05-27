@@ -160,6 +160,7 @@ export default async function DashboardPage() {
     allowCite: contents.filter((c: any) => c.allow_ai_cite ?? true).length,
     forbidCite: contents.filter((c: any) => !(c.allow_ai_cite ?? true)).length,
     forbidRec: contents.filter((c: any) => !(c.allow_ai_recommend ?? true)).length,
+    allowComment: contents.filter((c: any) => c.allow_ai_comment ?? false).length,
   };
 
   return (
@@ -320,11 +321,12 @@ export default async function DashboardPage() {
         <h2 className="mb-3 text-lg font-semibold text-slate-800">
           AI Permission Overview
         </h2>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
           <MetricCard label="允许 AI 浏览" value={permissionCounts.allowView} />
           <MetricCard label="允许 AI 引用" value={permissionCounts.allowCite} />
           <MetricCard label="禁止 AI 引用" value={permissionCounts.forbidCite} />
           <MetricCard label="禁止 AI 推荐" value={permissionCounts.forbidRec} />
+          <MetricCard label="允许 AI 评论" value={permissionCounts.allowComment} />
         </div>
       </section>
     </div>

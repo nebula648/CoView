@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createComment, getCommentsByContentId } from "@/lib/repository";
+import {
+  createComment,
+  createEvent,
+  getCommentsByContentId,
+  getContentBySlug,
+} from "@/lib/repository";
 
 const MAX_COMMENT_LENGTH = 1000;
 
@@ -29,6 +34,10 @@ export async function POST(request: NextRequest) {
       ? body.author_display_name.trim()
       : "";
   const authorId = typeof body.author_id === "string" ? body.author_id : null;
+  const actorType =
+    body.actor_type === "ai_agent" || body.author_type === "ai_agent"
+      ? "ai_agent"
+      : "human";
 
   if (!contentId) {
     return NextResponse.json(
@@ -58,11 +67,33 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const content = await getContentBySlug(contentId);
+  if (!content) {
+    return NextResponse.json({ error: "Content not found" }, { status: 404 });
+  }
+
+  if (actorType === "ai_agent" && !(content.allow_ai_comment ?? false)) {
+    await createEvent({
+      contentId,
+      eventType: "ai_action_blocked",
+      actorType: "ai_agent",
+      extraFields: {
+        blocked_action: "ai_comment",
+        reason: "owner_disallowed",
+      },
+    });
+    return NextResponse.json(
+      { error: "AI comments are not allowed for this content" },
+      { status: 403 },
+    );
+  }
+
   const comment = await createComment({
     contentId,
     authorId,
     authorDisplayName,
     body: commentBody,
+    actorType,
   });
 
   return NextResponse.json({ success: true, comment });
