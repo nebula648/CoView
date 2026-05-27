@@ -5,10 +5,13 @@
  * Creates all tables if they don't exist, using raw SQL via pg Pool.
  */
 import { Pool } from "pg";
+import { getDatabaseUrl, logDatabaseError } from "./utils";
 
-const DATABASE_URL = process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/coview";
+const DATABASE_URL = getDatabaseUrl();
 
 const SQL = `
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE IF NOT EXISTS contents (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   slug TEXT UNIQUE NOT NULL,
@@ -83,10 +86,12 @@ async function main() {
   const pool = new Pool({ connectionString: DATABASE_URL, max: 1 });
 
   try {
+    await pool.query("SELECT 1");
+    console.log("Connection OK.");
     await pool.query(SQL);
     console.log("Migration complete: all tables and indexes created.");
-  } catch (err: any) {
-    console.error("Migration failed:", err.message);
+  } catch (err: unknown) {
+    logDatabaseError("Migration failed:", err);
     process.exit(1);
   } finally {
     await pool.end();

@@ -10,11 +10,11 @@ import * as schema from "./schema";
 import { eq } from "drizzle-orm";
 import * as fs from "fs";
 import * as path from "path";
+import { getDatabaseUrl, logDatabaseError } from "./utils";
 
 const DATA_DIR = path.resolve(process.cwd(), "..", "data");
-const DATABASE_URL =
-  process.env.DATABASE_URL ??
-  "postgresql://postgres:postgres@localhost:5432/coview";
+const DATABASE_URL = getDatabaseUrl();
+const REQUIRED_TABLES = ["contents", "content_metrics", "events", "ai_decisions"];
 
 function readJSON(filename: string): any[] {
   const filePath = path.join(DATA_DIR, filename);
@@ -40,6 +40,8 @@ async function main() {
   const db = drizzle(pool, { schema });
 
   try {
+    await assertMigrationComplete(pool);
+
     // --- Insert contents ---
     for (const c of contents) {
       const existing = await db
@@ -145,11 +147,35 @@ async function main() {
     console.log(`  OK ${eventCount} events inserted (${events.length - eventCount} skipped)`);
 
     console.log("\nSeed complete.");
-  } catch (err: any) {
-    console.error("Seed failed:", err.message);
+  } catch (err: unknown) {
+    logDatabaseError("Seed failed:", err);
     process.exit(1);
   } finally {
     await pool.end();
+  }
+}
+
+async function assertMigrationComplete(pool: Pool): Promise<void> {
+  await pool.query("SELECT 1");
+
+  const result = await pool.query(
+    `
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+      AND table_name = ANY($1::text[])
+    `,
+    [REQUIRED_TABLES],
+  );
+  const existingTables = new Set(result.rows.map((row) => row.table_name));
+  const missingTables = REQUIRED_TABLES.filter((table) => !existingTables.has(table));
+
+  if (missingTables.length > 0) {
+    throw new Error(
+      "Migration has not completed. Missing tables: " +
+        missingTables.join(", ") +
+        ". Run `npx tsx db/migrate.ts` successfully before `npx tsx db/seed.ts`.",
+    );
   }
 }
 
