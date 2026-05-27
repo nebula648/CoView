@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P6-9 产品收尾与公开演示准备完成并上线。
+P7 管理后台轻量访问保护完成并上线。
 
 ## 线上地址
 
@@ -304,6 +304,27 @@ P6-9 产品收尾与公开演示准备完成并上线。
 - DEMO_GUIDE 包含：CoView 说明、演示地址、11 步推荐路径、核心功能清单、Demo 限制、安全说明、Roadmap
 - 所有文档仅修改文案，无业务逻辑、API、数据库、部署配置改动
 
+### P7 管理后台轻量访问保护
+
+- GitHub commit: fa99542 Add lightweight admin access gate
+- 新增 `web/proxy.ts` — Next.js 16 proxy 路由拦截（替代 middleware.ts）
+- 新增 `web/app/admin/access/page.tsx` — 访问码输入页面（Server Component）
+- 新增 `web/app/admin/access/actions.ts` — Server Action 验证访问码并设置 httpOnly cookie
+- 新增 `web/app/admin/access/submit-button.tsx` — 带 pending 态的提交按钮
+- 修改 `web/app/admin/layout.tsx` — 更新 warning 文案为"已受轻量访问码保护"
+- `/admin` 及其子页面（`/admin/contents`、`/admin/comments`、`/admin/events`）受 Admin Access Gate 保护
+- 未授权访问 admin 路由重定向至 `/admin/access`，正确输入 `ADMIN_ACCESS_CODE` 后设置 httpOnly cookie 放行
+- Cookie 配置：`httpOnly: true`、`sameSite: "lax"`、`path: "/"`、`maxAge: 86400`、production 下 `secure: true`
+- 生产环境未配置 `ADMIN_ACCESS_CODE` 时返回 503；开发环境未配置则直接放行
+- 保留 admin 页面 `noindex` / `nofollow`
+- 公开页面不受影响
+- 使用 Node.js `crypto.createHash("sha256")` 做 token 哈希比对
+- lint 通过
+- build 通过
+- 不涉及数据库 schema 修改
+- 不涉及正式登录系统
+- 未新增用户表、OAuth、注册登录功能
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -313,9 +334,7 @@ P6-9 产品收尾与公开演示准备完成并上线。
 
 ## 下一步建议
 
-P5-P6：产品完善与轻量互动系统。
-
-剩余任务：
+P0-P7 核心功能已全部完成。剩余任务：
 
 1. ~~优化首页文案和视觉结构~~ ✅
 2. ~~优化发现页内容卡片~~ ✅
@@ -332,11 +351,12 @@ P5-P6：产品完善与轻量互动系统。
 13. ~~UI Copy Style Guide + Bilingual Polish~~ ✅
 14. ~~增加正式使用说明（DEMO_GUIDE + README 重写）~~ ✅
 15. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
-16. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+16. ~~管理后台轻量访问保护~~ ✅
+17. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P7：管理后台认证保护、评论审核机制、AI Agent 评论模拟接口等后续规划。
+P7-1：后台保护验收与文档更新，或 P8 产品公开演示最终检查。
 
 ## 注意事项
 
