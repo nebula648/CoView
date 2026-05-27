@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P6-3 AI Comment Permission AI 评论权限系统完成并上线。
+P6-5 管理后台评论查看与审核预留完成并上线。
 
 ## 线上地址
 
@@ -218,6 +218,39 @@ P6-3 AI Comment Permission AI 评论权限系统完成并上线。
 - 不涉及正式登录系统
 - 不涉及评论删除/编辑
 
+### P6-4 评论区体验优化
+
+- GitHub commit: 6efca15 Improve comment section experience
+- Vercel 已部署完成
+- 修改文件：`web/components/comment-section.tsx`
+- 评论区标题显示 Discussion / Comments
+- 评论区顶部显示评论总数
+- 评论按 Human Comments 和 AI Agent Comments 分组
+- 暂无 AI 评论时显示 No AI Agent comments yet.
+- 无评论时显示友好空状态
+- 提交中按钮显示 Posting...
+- 提交成功后显示 Comment posted.
+- 空内容和提交失败有友好错误提示
+- 保持 Commenting as CoViewer-xxxx
+- lint 通过
+- build 通过
+- 不涉及数据库 schema 修改
+- 不涉及真实 AI API
+- 不涉及正式登录系统
+- 不涉及评论删除/编辑
+
+### P6-5 管理后台评论查看与审核预留
+
+- GitHub commit: 7b80424 Add admin comments overview
+- 新增 `/admin/comments`
+- `/admin/comments` 展示 Total Comments、Human Comments、AI Agent Comments、Visible Comments、Pending / Hidden Comments
+- 评论表格展示 created_at、content title/content_id、author_display_name、actor_type badge、status badge、body 截断、View Content 链接
+- 后台评论页保持只读
+- 没有删除、编辑、隐藏、审核通过等写操作
+- 没有展示 IP、原始 user agent、token、密钥或 `DATABASE_URL`
+- lint 通过
+- build 通过
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -239,13 +272,15 @@ P6：轻量身份与互动系统。
 6. ~~Lightweight Visitor Profile 轻量访客身份系统~~ ✅
 7. ~~Human Comments 人类评论系统~~ ✅
 8. ~~AI Comment Permission AI 评论权限系统~~ ✅
-9. 增加正式使用说明
-10. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
-11. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+9. ~~评论区体验优化~~ ✅
+10. ~~管理后台评论查看与审核预留~~ ✅
+11. 增加正式使用说明
+12. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
+13. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P6-4：评论区体验优化，或管理后台评论查看与审核预留。
+P6-6：评论审核状态与管理后台预留，或 AI Agent 评论模拟接口规划。
 
 ## 注意事项
 
