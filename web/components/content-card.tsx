@@ -177,7 +177,7 @@ export function ContentCard({
             href={`/api/contents/${slug}.json`}
             className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors"
           >
-            AI JSON
+            Open AI JSON
             <span aria-hidden="true">↗</span>
           </Link>
         </div>

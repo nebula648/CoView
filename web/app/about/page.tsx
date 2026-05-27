@@ -86,7 +86,7 @@ export default function AboutPage() {
 
       <section className="mb-12">
         <h2 className="mb-3 text-2xl font-bold text-slate-800">
-          What is CoView?
+          What is CoView / 什么是 CoView
         </h2>
         <div className="space-y-3 text-sm leading-7 text-slate-600">
           <p>
@@ -102,7 +102,7 @@ export default function AboutPage() {
 
       <section className="mb-12">
         <h2 className="mb-3 text-2xl font-bold text-slate-800">
-          Why Human + AI Co-Reading?
+          Why Human + AI Co-Reading / 为什么需要人机共读
         </h2>
         <p className="mb-5 text-sm leading-7 text-slate-600">
           未来的内容会同时被人类和 AI 消费。两者都重要，但它们代表的价值不同，因此需要分开统计。
@@ -124,7 +124,7 @@ export default function AboutPage() {
       </section>
 
       <section className="mb-12">
-        <h2 className="mb-5 text-2xl font-bold text-slate-800">Core Features</h2>
+        <h2 className="mb-5 text-2xl font-bold text-slate-800">Core Features / 核心功能</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CORE_FEATURES.map((feature) => (
             <div key={feature.title} className="rounded-xl border bg-white p-5 shadow-sm">
@@ -139,7 +139,7 @@ export default function AboutPage() {
 
       <section className="mb-12">
         <h2 className="mb-3 text-2xl font-bold text-slate-800">
-          AI Permissions Explained
+          AI Permissions Explained / AI 权限说明
         </h2>
         <p className="mb-5 text-sm leading-7 text-slate-600">
           创作者可以逐条内容设置 AI 使用边界。CoView 会在页面、API 和事件日志中保留这些权限信息。
@@ -164,7 +164,7 @@ export default function AboutPage() {
       <section className="mb-12 grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-xl font-bold text-slate-800">
-            What CoView is not
+            What CoView is not / CoView 的边界
           </h2>
           <ul className="space-y-2 text-sm leading-6 text-slate-600">
             <li>不是正式登录系统。</li>
@@ -175,7 +175,7 @@ export default function AboutPage() {
         </div>
 
         <div className="rounded-xl border bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-xl font-bold text-slate-800">Roadmap</h2>
+          <h2 className="mb-4 text-xl font-bold text-slate-800">Roadmap / 路线图</h2>
           <ul className="space-y-2 text-sm leading-6 text-slate-600">
             {ROADMAP.map((item) => (
               <li key={item}>{item}</li>

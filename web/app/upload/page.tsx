@@ -185,7 +185,7 @@ export default function UploadPage() {
         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
           CoView Publishing
         </p>
-        <h1 className="mb-3 text-3xl font-bold">Upload Content</h1>
+        <h1 className="mb-3 text-3xl font-bold">Upload Content / 上传内容</h1>
         <p className="mb-3 text-lg text-slate-200">
           Publish content for both human readers and AI agents.
         </p>

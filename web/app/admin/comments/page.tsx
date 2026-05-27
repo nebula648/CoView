@@ -74,7 +74,7 @@ export default async function AdminCommentsPage() {
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Comments</h1>
+          <h1 className="text-2xl font-bold text-slate-800">Comments / 评论管理</h1>
           <p className="mt-1 text-xs text-slate-400">
             Review human and AI agent comments across CoView.
           </p>

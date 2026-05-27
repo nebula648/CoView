@@ -174,7 +174,7 @@ export default async function DashboardPage() {
       <section className="mb-8">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-800">
-            Traffic Overview
+            Traffic Overview / 流量概览
           </h2>
           <span className="text-xs text-slate-400">
             Human vs AI attention ratio: {attentionRatio}
@@ -209,7 +209,7 @@ export default async function DashboardPage() {
 
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold text-slate-800">
-          Event Type Distribution
+          Event Type Distribution / 事件类型分布
         </h2>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {EVENT_TYPES.map((eventType) => (
@@ -227,7 +227,7 @@ export default async function DashboardPage() {
 
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold text-slate-800">
-          Content Leaderboards
+          Content Leaderboards / 内容排行榜
         </h2>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <RankingList
@@ -253,7 +253,7 @@ export default async function DashboardPage() {
 
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold text-slate-800">
-          Recent Events Summary
+          Recent Events Summary / 最近事件摘要
         </h2>
         <div className="rounded-xl border bg-white shadow-sm">
           {eventAnalytics.recentEvents.length === 0 ? (
@@ -319,7 +319,7 @@ export default async function DashboardPage() {
 
       <section>
         <h2 className="mb-3 text-lg font-semibold text-slate-800">
-          AI Permission Overview
+          AI Permission Overview / AI 权限概览
         </h2>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
           <MetricCard label="Allow AI View" value={permissionCounts.allowView} />

@@ -12,7 +12,7 @@ export default async function DiscoverPage() {
       {/* Header */}
       <section className="mb-10">
         <h1 className="text-3xl font-bold text-slate-800 mb-2">
-          Discover Content
+          Discover Content / 发现内容
         </h1>
         <p className="text-lg text-slate-500 mb-1">
           Explore content that can be read by humans and AI agents.

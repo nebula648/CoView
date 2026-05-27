@@ -9,7 +9,7 @@ export default async function AdminPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Admin Console</h1>
+      <h1 className="text-2xl font-bold text-slate-800 mb-6">Admin Console / 管理后台</h1>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">

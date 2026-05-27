@@ -71,7 +71,7 @@ export default async function AdminEventsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Event Log</h1>
+          <h1 className="text-2xl font-bold text-slate-800">Event Log / 事件日志</h1>
           <p className="mt-1 text-xs text-slate-400">
             Read-only event analytics. IP addresses and raw user agents are not
             shown.

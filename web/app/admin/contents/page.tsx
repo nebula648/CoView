@@ -23,7 +23,7 @@ export default async function AdminContentsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Manage Contents</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Manage Contents / 内容管理</h1>
         <span className="text-xs text-slate-400">{contents.length} total</span>
       </div>
 

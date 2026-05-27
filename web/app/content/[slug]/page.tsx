@@ -218,7 +218,7 @@ export default async function ContentDetailPage({
       {/* ================================================================ */}
       <section className="mb-10">
         <h2 className="text-lg font-semibold text-slate-800 mb-4">
-          Dual-Track Metrics
+          Dual-Track Metrics / 双轨指标
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -257,7 +257,7 @@ export default async function ContentDetailPage({
       {/* ================================================================ */}
       <section className="mb-10">
         <h2 className="text-lg font-semibold text-slate-800 mb-3">
-          AI Permissions
+          AI Permissions / AI 权限
         </h2>
         <div className="flex flex-wrap gap-2">
           <PermissionBadge label="View" allowed={content.allow_ai_view ?? true} />
@@ -273,7 +273,7 @@ export default async function ContentDetailPage({
       {/* ================================================================ */}
       <section className="mb-10">
         <h2 className="text-lg font-semibold text-slate-800 mb-3">
-          AI-Readable Entry
+          AI-Readable Entry / AI 可读入口
         </h2>
         <div className="rounded-xl border bg-slate-50 px-5 py-4 flex flex-wrap items-center justify-between gap-3">
           <code className="text-sm font-medium text-slate-700 break-all">
@@ -294,7 +294,7 @@ export default async function ContentDetailPage({
       {/* ================================================================ */}
       <section className="mb-10">
         <h2 className="text-lg font-semibold text-slate-800 mb-3">
-          Recent Events
+          Recent Events / 最近事件
         </h2>
         {events.length === 0 ? (
           <div className="rounded-xl border bg-white px-5 py-8 text-center">

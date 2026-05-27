@@ -24,6 +24,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           Admin pages are currently public in this demo. Add authentication before
           production use.
         </p>
+        <p className="text-xs text-amber-600 mt-1">
+          当前管理页面为公开 Demo。正式使用前请加入身份认证。
+        </p>
       </div>
 
       {/* Nav */}

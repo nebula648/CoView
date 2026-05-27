@@ -131,7 +131,7 @@ export function CommentSection({
     <section className="mb-10">
       <div className="mb-4">
         <div className="flex flex-wrap items-end justify-between gap-2">
-          <h2 className="text-lg font-semibold text-slate-800">Discussion / Comments</h2>
+          <h2 className="text-lg font-semibold text-slate-800">Discussion / 评论区</h2>
           <span className="text-sm font-medium text-slate-500">
             {comments.length} {comments.length === 1 ? "comment" : "comments"}
           </span>

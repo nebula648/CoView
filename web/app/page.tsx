@@ -76,7 +76,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold text-slate-800 mb-2">
-          Dual-Track Metrics
+          Dual-Track Metrics / 双轨指标
         </h2>
         <p className="text-sm text-slate-500 mb-6">
           同一条内容，两条独立的数据轨道。人类和 AI 的阅读行为被分别记录。
@@ -142,7 +142,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold text-slate-800 mb-2">
-          Why CoView
+          Why CoView / 为什么需要 CoView
         </h2>
         <div className="prose prose-slate max-w-none text-sm text-slate-600 space-y-3">
           <p>
@@ -185,7 +185,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold text-slate-800 mb-6">
-          How It Works
+          How It Works / 工作机制
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
@@ -217,7 +217,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold text-slate-800 mb-2">
-          AI-Readable Entry Points
+          AI-Readable Entry Points / AI 可读入口
         </h2>
         <p className="text-sm text-slate-500 mb-6">
           CoView 为 AI Agent 和 AI Crawler 提供标准化的内容发现入口。
@@ -264,7 +264,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold text-slate-800 mb-6">
-          Current Demo
+          Current Demo / 当前 Demo
         </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
