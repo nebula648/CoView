@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const ADMIN_NAV = [
   { href: "/admin", label: "Console" },
   { href: "/admin/contents", label: "Contents" },
+  { href: "/admin/comments", label: "Comments" },
   { href: "/admin/events", label: "Events" },
 ];
 

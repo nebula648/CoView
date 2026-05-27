@@ -40,12 +40,18 @@ export default async function AdminPage() {
       </div>
 
       {/* Quick links */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-10">
         <Link
           href="/admin/contents"
           className="rounded-lg border bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors text-center"
         >
           Manage Contents
+        </Link>
+        <Link
+          href="/admin/comments"
+          className="rounded-lg border bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors text-center"
+        >
+          Comments
         </Link>
         <Link
           href="/admin/events"

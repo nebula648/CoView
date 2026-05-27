@@ -12,6 +12,7 @@ import {
   writeProfiles,
 } from "@/lib/data-source";
 import { hashUA, hashIP } from "@/lib/dedup";
+import type { AdminComment, CommentStats } from "@/lib/types";
 
 const DEFAULT_AUTHOR_NAME = "CoView Demo Author";
 
@@ -447,6 +448,58 @@ export async function getCommentsByContentId(contentId: string): Promise<any[]> 
             new Date(a.created_at).getTime(),
         );
     },
+  );
+}
+
+export async function getAdminComments(limit: number = 100): Promise<AdminComment[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select({
+          comment: schema.comments,
+          contentTitle: schema.contents.title,
+          contentSlug: schema.contents.slug,
+        })
+        .from(schema.comments)
+        .leftJoin(schema.contents, eq(schema.comments.contentId, schema.contents.id))
+        .orderBy(desc(schema.comments.createdAt))
+        .limit(limit);
+
+      return rows.map((row: any) => ({
+        ...mapDBComment(row.comment),
+        content_title: row.contentTitle ?? null,
+        content_slug: row.contentSlug ?? row.comment.contentId,
+      }));
+    },
+    () => {
+      const contents = readContents();
+      return readComments()
+        .map(ensureCommentShape)
+        .sort(
+          (a: any, b: any) =>
+            new Date(b.created_at).getTime() -
+            new Date(a.created_at).getTime(),
+        )
+        .slice(0, limit)
+        .map((comment: any) => {
+          const content = contents.find((item: any) => item.id === comment.content_id);
+          return {
+            ...comment,
+            content_title: content?.title ?? null,
+            content_slug: content?.slug ?? content?.id ?? comment.content_id,
+          };
+        });
+    },
+  );
+}
+
+export async function getCommentStats(): Promise<CommentStats> {
+  return tryDB(
+    async (db) => {
+      const comments = await db.select().from(schema.comments);
+      return buildCommentStats(comments.map(mapDBComment));
+    },
+    () => buildCommentStats(readComments().map(ensureCommentShape)),
   );
 }
 
@@ -987,7 +1040,7 @@ function mapDBComment(row: any): any {
     author_display_name: row.authorDisplayName,
     actor_type: row.actorType === "ai_agent" ? "ai_agent" : "human",
     body: row.body,
-    status: row.status,
+    status: normalizeCommentStatus(row.status),
     created_at: row.createdAt
       ? new Date(row.createdAt).toISOString().replace("T", " ").substring(0, 19)
       : "",
@@ -1002,11 +1055,28 @@ function ensureCommentShape(comment: any): any {
     author_display_name: comment.author_display_name ?? DEFAULT_AUTHOR_NAME,
     actor_type: comment.actor_type === "ai_agent" ? "ai_agent" : "human",
     body: comment.body ?? "",
-    status: comment.status ?? "visible",
+    status: normalizeCommentStatus(comment.status),
     created_at:
       comment.created_at ??
       comment.timestamp ??
       new Date().toISOString().replace("T", " ").substring(0, 19),
+  };
+}
+
+function normalizeCommentStatus(status: string | undefined): string {
+  if (status === "pending" || status === "hidden") return status;
+  return "visible";
+}
+
+function buildCommentStats(comments: any[]): CommentStats {
+  return {
+    totalComments: comments.length,
+    humanComments: comments.filter((comment) => comment.actor_type === "human").length,
+    aiAgentComments: comments.filter((comment) => comment.actor_type === "ai_agent").length,
+    visibleComments: comments.filter((comment) => comment.status === "visible").length,
+    pendingHiddenComments: comments.filter(
+      (comment) => comment.status === "pending" || comment.status === "hidden",
+    ).length,
   };
 }
 

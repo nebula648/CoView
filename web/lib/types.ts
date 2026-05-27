@@ -24,8 +24,23 @@ export interface Comment {
   author_display_name: string;
   actor_type: "human" | "ai_agent";
   body: string;
-  status: "visible";
+  status: CommentStatus;
   created_at: string;
+}
+
+export type CommentStatus = "visible" | "pending" | "hidden";
+
+export interface AdminComment extends Comment {
+  content_title: string | null;
+  content_slug: string | null;
+}
+
+export interface CommentStats {
+  totalComments: number;
+  humanComments: number;
+  aiAgentComments: number;
+  visibleComments: number;
+  pendingHiddenComments: number;
 }
 
 export interface AiReadableContent {
