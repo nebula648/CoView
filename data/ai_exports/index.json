@@ -1,0 +1,56 @@
+[
+  {
+    "content_id": "53a7addb-f8fb-401d-8250-546348908410",
+    "title": "2026/5/27 2.02  我发布了第一条推文",
+    "ai_summary": "这条内容围绕“2026/5/27 2.02  我发布了第一条推文”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+    "ai_tags": [
+      "CoView 共览｜人类与 AI 共同浏览的内容平台",
+      "AI阅读",
+      "内容平台",
+      "数据分析",
+      "知识引用",
+      "视频内容"
+    ],
+    "ai_value_score": 67,
+    "ai_citation_suitability": "High",
+    "allow_ai_cite": true,
+    "allow_ai_recommend": true,
+    "export_file": "53a7addb-f8fb-401d-8250-546348908410.json"
+  },
+  {
+    "content_id": "seed-coview-001",
+    "title": "AI 也应该被统计为一种读者吗？",
+    "ai_summary": "这条内容围绕“AI 也应该被统计为一种读者吗？”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+    "ai_tags": [
+      "AI阅读",
+      "内容平台",
+      "双轨数据",
+      "数据分析",
+      "知识引用",
+      "观点讨论"
+    ],
+    "ai_value_score": 74,
+    "ai_citation_suitability": "High",
+    "allow_ai_cite": true,
+    "allow_ai_recommend": true,
+    "export_file": "seed-coview-001.json"
+  },
+  {
+    "content_id": "seed-coview-002",
+    "title": "共览内容平台的第一版形态",
+    "ai_summary": "这条内容围绕“共览内容平台的第一版形态”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+    "ai_tags": [
+      "MVP",
+      "图文",
+      "产品原型",
+      "AI阅读",
+      "内容平台",
+      "知识引用"
+    ],
+    "ai_value_score": 78,
+    "ai_citation_suitability": "High",
+    "allow_ai_cite": true,
+    "allow_ai_recommend": true,
+    "export_file": "seed-coview-002.json"
+  }
+]

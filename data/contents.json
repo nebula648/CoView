@@ -1,0 +1,167 @@
+[
+  {
+    "id": "53a7addb-f8fb-401d-8250-546348908410",
+    "title": "2026/5/27 2.02  我发布了第一条推文",
+    "body": "CoView 是一个面向人类用户与 AI Agent 的新一代内容平台，支持视频、图文、文档等内容上传，并分别统计人类浏览量、AI 浏览量、AI 收藏、AI 引用与 AI 推荐数据。",
+    "tags": [
+      "CoView 共览｜人类与 AI 共同浏览的内容平台"
+    ],
+    "created_at": "2026-05-27 02:04",
+    "metrics": {
+      "human_views": 8,
+      "human_likes": 16,
+      "human_saves": 2,
+      "ai_views": 13,
+      "ai_saves": 7,
+      "ai_citations": 7
+    },
+    "ai_analysis": {
+      "summary": "这条内容围绕“2026/5/27 2.02  我发布了第一条推文”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+      "tags": [
+        "CoView 共览｜人类与 AI 共同浏览的内容平台",
+        "AI阅读",
+        "内容平台",
+        "数据分析",
+        "知识引用",
+        "视频内容"
+      ]
+    },
+    "ai_summary": "这条内容围绕“2026/5/27 2.02  我发布了第一条推文”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+    "ai_tags": [
+      "CoView 共览｜人类与 AI 共同浏览的内容平台",
+      "AI阅读",
+      "内容平台",
+      "数据分析",
+      "知识引用",
+      "视频内容"
+    ],
+    "ai_recommended_scenarios": [
+      "产品介绍",
+      "研究引用",
+      "内容推荐"
+    ],
+    "ai_citation_suitability": "High",
+    "ai_value_score": 67,
+    "ai_reason": "AI 根据正文长度为 91 字、原始标签数为 1 个、命中 4 个引用相关关键词，给出 67 分，并判断引用适配度为 High。",
+    "ai_recommendations": 2,
+    "ai_decision": {
+      "should_read": true,
+      "should_save": false,
+      "should_cite": true,
+      "should_recommend": true,
+      "should_reject_citation": false,
+      "decision_reason": "AI 评估正文长度为 91 字，价值分为 67，引用适配度为 High。因此决定不收藏、引用、推荐。",
+      "confidence_score": 0.76
+    },
+    "allow_ai_view": true,
+    "allow_ai_save": true,
+    "allow_ai_cite": true,
+    "allow_ai_recommend": true
+  },
+  {
+    "id": "seed-coview-001",
+    "title": "AI 也应该被统计为一种读者吗？",
+    "body": "当 AI 开始浏览、总结、收藏和引用内容时，内容平台需要重新理解“阅读”这件事。CoView 试图把人类阅读和 AI 阅读拆成两条清晰的数据轨道，让创作者看到内容在人类与 AI 两类读者中的传播方式。",
+    "tags": [
+      "AI阅读",
+      "内容平台",
+      "双轨数据"
+    ],
+    "created_at": "2026-05-27 09:00",
+    "metrics": {
+      "human_views": 8,
+      "human_likes": 1,
+      "human_saves": 1,
+      "ai_views": 13,
+      "ai_saves": 2,
+      "ai_citations": 1
+    },
+    "ai_analysis": {
+      "summary": "这条内容围绕“AI 也应该被统计为一种读者吗？”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+      "tags": [
+        "AI阅读",
+        "内容平台",
+        "双轨数据",
+        "数据分析",
+        "知识引用",
+        "观点讨论"
+      ]
+    },
+    "ai_summary": "这条内容围绕“AI 也应该被统计为一种读者吗？”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+    "ai_tags": [
+      "AI阅读",
+      "内容平台",
+      "双轨数据",
+      "数据分析",
+      "知识引用",
+      "观点讨论"
+    ],
+    "ai_recommended_scenarios": [
+      "知识解释",
+      "产品介绍",
+      "研究引用",
+      "内容推荐"
+    ],
+    "ai_citation_suitability": "High",
+    "ai_value_score": 74,
+    "ai_reason": "AI 根据正文长度为 100 字、原始标签数为 3 个、命中 4 个引用相关关键词，给出 74 分，并判断引用适配度为 High。",
+    "ai_recommendations": 0,
+    "ai_decision": {},
+    "allow_ai_view": true,
+    "allow_ai_save": true,
+    "allow_ai_cite": true,
+    "allow_ai_recommend": true
+  },
+  {
+    "id": "seed-coview-002",
+    "title": "共览内容平台的第一版形态",
+    "body": "第一版 CoView 不急于做复杂的视频系统或完整账号体系，而是先用图文内容验证核心概念：同一条内容可以同时拥有 Human Metrics 和 AI Metrics，AI 还能产生摘要、标签、收藏与引用行为。",
+    "tags": [
+      "MVP",
+      "图文",
+      "产品原型"
+    ],
+    "created_at": "2026-05-27 09:15",
+    "metrics": {
+      "human_views": 8,
+      "human_likes": 7,
+      "human_saves": 5,
+      "ai_views": 7,
+      "ai_saves": 2,
+      "ai_citations": 3
+    },
+    "ai_analysis": {
+      "summary": "这条内容围绕“共览内容平台的第一版形态”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+      "tags": [
+        "MVP",
+        "图文",
+        "产品原型",
+        "AI阅读",
+        "内容平台",
+        "知识引用"
+      ]
+    },
+    "ai_summary": "这条内容围绕“共览内容平台的第一版形态”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+    "ai_tags": [
+      "MVP",
+      "图文",
+      "产品原型",
+      "AI阅读",
+      "内容平台",
+      "知识引用"
+    ],
+    "ai_recommended_scenarios": [
+      "产品介绍",
+      "研究引用"
+    ],
+    "ai_citation_suitability": "High",
+    "ai_value_score": 78,
+    "ai_reason": "AI 根据正文长度为 105 字、原始标签数为 3 个、命中 3 个引用相关关键词，给出 78 分，并判断引用适配度为 High。",
+    "ai_recommendations": 0,
+    "ai_decision": {},
+    "allow_ai_view": true,
+    "allow_ai_save": true,
+    "allow_ai_cite": true,
+    "allow_ai_recommend": true
+  }
+]

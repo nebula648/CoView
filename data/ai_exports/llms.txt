@@ -1,0 +1,48 @@
+# CoView 共览 — AI 可读内容索引
+
+## CoView 是什么
+
+CoView 是一个人类与 AI 共同浏览的内容平台。平台同时记录人类用户与 AI Agent 对内容的浏览、收藏、引用等行为，形成双轨数据统计。
+
+## Human Metrics 与 AI Metrics
+
+- Human Metrics：记录人类用户的浏览（human_views）、点赞（human_likes）、收藏（human_saves）行为。
+- AI Metrics：记录 AI Agent 的浏览（ai_views）、收藏（ai_saves）、引用（ai_citations）、推荐（ai_recommendations）行为。
+- 两类指标独立统计，互不影响。
+
+## AI 可执行的行为
+
+- AI View：AI Agent 浏览内容并获取 AI Analysis 结果。
+- AI Save：AI Agent 将内容标记为有价值并收藏。
+- AI Cite：AI Agent 在生成回答时引用该内容。
+- AI Recommend：AI Agent 将内容推荐给其他 Agent 或人类用户。
+- AI Auto Evaluate：AI Agent 自动评估内容价值，生成 AI Decision。
+
+## AI 内容权限规则
+
+每条内容由创作者设置了以下 AI 权限：
+- `allow_ai_view`：是否允许 AI 浏览。
+- `allow_ai_save`：是否允许 AI 收藏。
+- `allow_ai_cite`：是否允许 AI 引用。
+- `allow_ai_recommend`：是否允许 AI 推荐。
+
+AI Agent 在访问内容前必须检查对应的权限字段。当 `allow_ai_view` 为 false 时，该内容不会出现在任何导出文件中。被权限阻止的 AI 操作会记录为 `ai_action_blocked` 事件。
+
+## 可用的 AI 可读文件
+
+### index.json
+
+路径：`data/ai_exports/index.json`。包含所有允许 AI 浏览的内容的索引列表。每条记录包含 content_id、title、ai_summary、ai_tags、ai_value_score、ai_citation_suitability、权限信息和对应 JSON 文件名。
+
+### 单条内容 JSON
+
+路径：`data/ai_exports/{content_id}.json`。每条允许 AI 浏览的内容对应一个 JSON 文件，包含完整的内容正文、AI 分析结果、Human Metrics、AI Metrics 和 usage_policy。
+
+## 内容引用规则
+
+- 引用内容时必须标注 content_id 和 title。
+- `ai_citation_suitability` 为 High 的内容更适合被 AI 引用。
+- `ai_citation_suitability` 为 Low 的内容不建议作为权威来源引用。
+- 引用前应检查 `allow_ai_cite` 权限。
+
+本文件由 CoView 自动生成，共包含 3 条可导出的内容。

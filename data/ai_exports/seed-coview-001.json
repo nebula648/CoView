@@ -1,0 +1,50 @@
+{
+  "content_id": "seed-coview-001",
+  "title": "AI 也应该被统计为一种读者吗？",
+  "body": "当 AI 开始浏览、总结、收藏和引用内容时，内容平台需要重新理解“阅读”这件事。CoView 试图把人类阅读和 AI 阅读拆成两条清晰的数据轨道，让创作者看到内容在人类与 AI 两类读者中的传播方式。",
+  "original_tags": [
+    "AI阅读",
+    "内容平台",
+    "双轨数据"
+  ],
+  "ai_summary": "这条内容围绕“AI 也应该被统计为一种读者吗？”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+  "ai_tags": [
+    "AI阅读",
+    "内容平台",
+    "双轨数据",
+    "数据分析",
+    "知识引用",
+    "观点讨论"
+  ],
+  "ai_recommended_scenarios": [
+    "知识解释",
+    "产品介绍",
+    "研究引用",
+    "内容推荐"
+  ],
+  "ai_citation_suitability": "High",
+  "ai_value_score": 74,
+  "ai_reason": "AI 根据正文长度为 100 字、原始标签数为 3 个、命中 4 个引用相关关键词，给出 74 分，并判断引用适配度为 High。",
+  "ai_decision": {},
+  "allow_ai_view": true,
+  "allow_ai_save": true,
+  "allow_ai_cite": true,
+  "allow_ai_recommend": true,
+  "human_metrics": {
+    "human_views": 8,
+    "human_likes": 1,
+    "human_saves": 1
+  },
+  "ai_metrics": {
+    "ai_views": 13,
+    "ai_saves": 2,
+    "ai_citations": 1,
+    "ai_recommendations": 0
+  },
+  "usage_policy": {
+    "can_ai_view": true,
+    "can_ai_save": true,
+    "can_ai_cite": true,
+    "can_ai_recommend": true
+  }
+}

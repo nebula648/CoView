@@ -1,0 +1,55 @@
+{
+  "content_id": "53a7addb-f8fb-401d-8250-546348908410",
+  "title": "2026/5/27 2.02  我发布了第一条推文",
+  "body": "CoView 是一个面向人类用户与 AI Agent 的新一代内容平台，支持视频、图文、文档等内容上传，并分别统计人类浏览量、AI 浏览量、AI 收藏、AI 引用与 AI 推荐数据。",
+  "original_tags": [
+    "CoView 共览｜人类与 AI 共同浏览的内容平台"
+  ],
+  "ai_summary": "这条内容围绕“2026/5/27 2.02  我发布了第一条推文”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+  "ai_tags": [
+    "CoView 共览｜人类与 AI 共同浏览的内容平台",
+    "AI阅读",
+    "内容平台",
+    "数据分析",
+    "知识引用",
+    "视频内容"
+  ],
+  "ai_recommended_scenarios": [
+    "产品介绍",
+    "研究引用",
+    "内容推荐"
+  ],
+  "ai_citation_suitability": "High",
+  "ai_value_score": 67,
+  "ai_reason": "AI 根据正文长度为 91 字、原始标签数为 1 个、命中 4 个引用相关关键词，给出 67 分，并判断引用适配度为 High。",
+  "ai_decision": {
+    "should_read": true,
+    "should_save": false,
+    "should_cite": true,
+    "should_recommend": true,
+    "should_reject_citation": false,
+    "decision_reason": "AI 评估正文长度为 91 字，价值分为 67，引用适配度为 High。因此决定不收藏、引用、推荐。",
+    "confidence_score": 0.76
+  },
+  "allow_ai_view": true,
+  "allow_ai_save": true,
+  "allow_ai_cite": true,
+  "allow_ai_recommend": true,
+  "human_metrics": {
+    "human_views": 8,
+    "human_likes": 16,
+    "human_saves": 2
+  },
+  "ai_metrics": {
+    "ai_views": 13,
+    "ai_saves": 7,
+    "ai_citations": 7,
+    "ai_recommendations": 2
+  },
+  "usage_policy": {
+    "can_ai_view": true,
+    "can_ai_save": true,
+    "can_ai_cite": true,
+    "can_ai_recommend": true
+  }
+}

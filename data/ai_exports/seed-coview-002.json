@@ -1,0 +1,48 @@
+{
+  "content_id": "seed-coview-002",
+  "title": "共览内容平台的第一版形态",
+  "body": "第一版 CoView 不急于做复杂的视频系统或完整账号体系，而是先用图文内容验证核心概念：同一条内容可以同时拥有 Human Metrics 和 AI Metrics，AI 还能产生摘要、标签、收藏与引用行为。",
+  "original_tags": [
+    "MVP",
+    "图文",
+    "产品原型"
+  ],
+  "ai_summary": "这条内容围绕“共览内容平台的第一版形态”展开，说明了相关概念、场景或机制。AI 判断它适合用于内容理解、资料整理和后续讨论。",
+  "ai_tags": [
+    "MVP",
+    "图文",
+    "产品原型",
+    "AI阅读",
+    "内容平台",
+    "知识引用"
+  ],
+  "ai_recommended_scenarios": [
+    "产品介绍",
+    "研究引用"
+  ],
+  "ai_citation_suitability": "High",
+  "ai_value_score": 78,
+  "ai_reason": "AI 根据正文长度为 105 字、原始标签数为 3 个、命中 3 个引用相关关键词，给出 78 分，并判断引用适配度为 High。",
+  "ai_decision": {},
+  "allow_ai_view": true,
+  "allow_ai_save": true,
+  "allow_ai_cite": true,
+  "allow_ai_recommend": true,
+  "human_metrics": {
+    "human_views": 8,
+    "human_likes": 7,
+    "human_saves": 5
+  },
+  "ai_metrics": {
+    "ai_views": 7,
+    "ai_saves": 2,
+    "ai_citations": 3,
+    "ai_recommendations": 0
+  },
+  "usage_policy": {
+    "can_ai_view": true,
+    "can_ai_save": true,
+    "can_ai_cite": true,
+    "can_ai_recommend": true
+  }
+}
