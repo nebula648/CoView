@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P5-5 管理后台初版已完成，准备上线。
+P5-5 管理后台 / 内容管理入口完成并上线。
 
 ## 线上地址
 
@@ -126,15 +126,20 @@ P5-5 管理后台初版已完成，准备上线。
 - 最近事件区域展示当前内容相关事件
 - GitHub commit: 290ed9b，Vercel 已部署上线
 
-### P5-5 管理后台初版
+### P5-5 管理后台 / 内容管理入口
 
 - 新增 `/admin` 管理后台首页
 - 新增 `/admin/contents` 内容管理列表
 - 新增 `/admin/events` 事件日志列表
+- GitHub 最新 commit: 42c6f7f Add noindex protection for admin pages
+- Vercel 部署状态 Ready / Current
+- `/admin` 可访问
+- `/admin/contents` 可访问
+- `/admin/events` 可访问
 - 后台当前为 public demo，只读展示，无删除、编辑、修改数据库等危险操作
 - 后台顶部明确提示：Admin pages are currently public in this demo. Add authentication before production use.
 - 后台页面已添加 `noindex` / `nofollow`，避免搜索引擎索引 `/admin`、`/admin/contents`、`/admin/events`
-- 本地 commit: 62e0083，等待推送上线
+- 原有公开页面和 API 未被破坏
 
 ## 最新构建与部署状态
 
@@ -160,7 +165,7 @@ P5：产品完善与安全整理（继续）。
 
 ## 下一阶段
 
-P5-6：事件日志和数据看板优化，或继续 P5-5 后续认证保护。
+P5-6：事件日志和数据看板优化。
 
 ## 注意事项
 
