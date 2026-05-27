@@ -1,32 +1,66 @@
 # CoView 共览
 
-CoView 是一个人类与 AI 共同浏览的内容平台。同一条内容同时维护 Human Metrics 与 AI Metrics，并为 AI Agent 提供结构化读取入口。
+A Human-AI co-browsing content platform that separates human attention from AI
+attention.
 
-## 当前项目结构
+CoView 共览是一个面向人类读者与 AI Agent 的共同内容平台。它将人类注意力与
+AI 注意力分开计量，让内容在人类世界和 AI 世界中的传播都变得可见。
 
-本仓库目前保留两个阶段的实现：
+**Live Demo**: [https://coview-web.vercel.app](https://coview-web.vercel.app)
 
-```text
+## What CoView Does
+
+- Humans read content on normal web pages and leave views, likes, and comments.
+- AI agents read content through structured JSON endpoints and leave their own
+  metrics: views, saves, citations, and recommendations.
+- Each piece of content carries **AI Permissions** — the creator decides whether
+  AI agents may view, save, cite, recommend, or comment.
+- A **Dashboard** shows both human and AI metrics side by side.
+- An **Admin Console** provides read-only visibility into content, events, and
+  comments.
+
+## Features
+
+| Area | Highlights |
+|---|---|
+| Content | Publish, discover, and read content with human + AI dual-track metrics |
+| AI Readable | `/api/contents/{slug}.json`, `/api/ai-index.json`, `llms.txt`, `robots.txt`, `sitemap.xml` |
+| Metrics | Human Metrics (views, likes, saves) and AI Metrics (views, saves, citations, recommends) tracked independently |
+| Permissions | Per-content AI View, Save, Cite, Recommend, Comment toggles |
+| Identity | Lightweight CoViewer visitor profiles (no password, no email) |
+| Comments | Human comments + AI comment permission system |
+| Admin | Read-only admin console with content, event, and comment overview |
+| Dashboard | Traffic overview, event type distribution, content leaderboards |
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router + Turbopack)
+- **Language**: TypeScript
+- **Styling**: TailwindCSS
+- **Database**: PostgreSQL (Supabase) with Drizzle ORM
+- **Deployment**: Vercel
+- **Fallback**: JSON files (`data/`) for local development without a database
+
+## Project Structure
+
+```
 CoView/
-├── app.py                  # 旧 Streamlit MVP，作为原型与 JSON 数据维护参考
-├── requirements.txt        # Streamlit MVP 依赖
-├── data/                   # JSON fallback 数据源
-│   ├── contents.json
-│   ├── events.json
-│   └── ai_exports/
-└── web/                    # Next.js 正式站主体
-    ├── app/
-    ├── components/
-    ├── db/
-    ├── lib/
-    ├── DATABASE_SETUP.md
-    ├── P0_TESTING.md
-    └── package.json
+├── app.py                  # Legacy Streamlit MVP (kept for reference)
+├── data/                   # JSON fallback data source
+├── docs/                   # Project documentation
+│   ├── DEMO_GUIDE.md
+│   └── UI_COPY_STYLE_GUIDE.md
+├── DEPLOYMENT.md           # Deployment guide
+├── PROJECT_STATUS.md       # Current development phase
+└── web/                    # Next.js production site
+    ├── app/                # App Router pages and API routes
+    ├── components/         # Shared React components
+    ├── db/                 # Schema, migration, seed scripts
+    ├── lib/                # Repository, data source, utilities
+    └── public/
 ```
 
-## 正式站
-
-Next.js 正式站位于 `web/`。后续开发、数据库接入、部署准备都应优先在 `web/` 中进行。
+## Local Development
 
 ```bash
 cd web
@@ -34,30 +68,39 @@ npm install
 npm run dev
 ```
 
-本地访问：
+Visit `http://localhost:3000`.
 
-```text
-http://localhost:3000
+Without a database, the app falls back to JSON files in `data/`. To connect a
+database, see [DEPLOYMENT.md](DEPLOYMENT.md) and
+[web/DATABASE_SETUP.md](web/DATABASE_SETUP.md).
+
+## Environment Variables
+
+Create `web/.env.local` (never commit this file):
+
+```
+DATABASE_URL=your_postgresql_connection_string
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-## 数据源策略
+Do not paste real credentials into source code or public documentation.
 
-正式站通过 `web/lib/repository.ts` 统一读取数据：
+## Documentation
 
-- 优先使用 PostgreSQL / Drizzle ORM。
-- 当 `DATABASE_URL` 不存在或数据库不可用时，fallback 到根目录 `data/contents.json` 与 `data/events.json`。
-- 不要删除 JSON fallback，它是本地开发和演示的安全兜底。
+- [Demo Guide](docs/DEMO_GUIDE.md) — recommended tour and demo limitations
+- [UI Copy Style Guide](docs/UI_COPY_STYLE_GUIDE.md) — bilingual copy rules
+- [Project Status](PROJECT_STATUS.md) — current phase and completed features
+- [Deployment Guide](DEPLOYMENT.md) — Vercel deployment and database setup
+- [Database Setup](web/DATABASE_SETUP.md) — PostgreSQL + Drizzle setup
+- [P0 Testing](web/P0_TESTING.md) — P0 acceptance checklist
 
-## 文档位置
+## Safety
 
-- 数据库配置说明：`web/DATABASE_SETUP.md`
-- P0 验收清单：`web/P0_TESTING.md`
-- Next.js 正式站说明：`web/README.md`
-- 当前开发状态：`PROJECT_STATUS.md`
+- Do not commit `.env.local`, `node_modules/`, `.next/`.
+- Do not expose `DATABASE_URL`, database passwords, or API keys.
+- Admin pages are public in this demo — add authentication before production use.
+- This is a research prototype. Do not publish sensitive data.
 
-## 注意事项
+## License
 
-- 不要提交 `.env.local`。
-- 不要提交 `node_modules/`、`.next/`、`tsconfig.tsbuildinfo`。
-- 不要把数据库连接串或 API Key 写入代码。
-- 旧 Streamlit MVP 可保留，但 P1/P2 之后的主线开发在 `web/`。
+This project is a public demo and research prototype.

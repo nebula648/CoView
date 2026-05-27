@@ -1,10 +1,14 @@
-# CoView Deployment Guide
+# CoView Deployment Guide / 部署指南
 
-This guide covers P2 database verification and deployment preparation for the
-Next.js app in `web/`.
+This guide covers database verification and Vercel deployment for the Next.js
+app in `web/`.
 
 Do not commit real secrets. Keep `DATABASE_URL` in `web/.env.local` locally and
 in Vercel Environment Variables for deployment.
+
+See [docs/DEMO_GUIDE.md](docs/DEMO_GUIDE.md) for the public demo tour and
+[docs/UI_COPY_STYLE_GUIDE.md](docs/UI_COPY_STYLE_GUIDE.md) for bilingual copy
+rules.
 
 ## Local Development Flow
 

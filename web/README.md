@@ -1,82 +1,97 @@
 # CoView Web
 
-这是 CoView 共览的 Next.js 正式站。
+CoView 共览的 Next.js 正式站主体。这是 CoView 的核心应用，包含所有前端页面、
+API 路由、数据库层和组件。
 
-## 技术栈
+**Live Demo**: [https://coview-web.vercel.app](https://coview-web.vercel.app)
 
-- Next.js App Router
+## Tech Stack / 技术栈
+
+- Next.js 16 (App Router + Turbopack)
 - TypeScript
 - TailwindCSS
-- PostgreSQL
-- Drizzle ORM
-- JSON fallback 数据源
+- PostgreSQL (Supabase) + Drizzle ORM
+- JSON fallback data source
+- Vercel deployment
 
-## 本地运行
+## Local Development / 本地运行
 
 ```bash
 npm install
 npm run dev
 ```
 
-访问：
+`http://localhost:3000`
 
-```text
-http://localhost:3000
-```
-
-## 常用命令
+Without a database, the app falls back to `../data/contents.json` and
+`../data/events.json`.
 
 ```bash
 npm run lint
 npm run build
 ```
 
-## 数据库模式
+## Database / 数据库
 
-配置 `.env.local`：
+Create `web/.env.local` (never commit):
 
-```text
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/coview
+```
+DATABASE_URL=your_postgresql_connection_string
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-初始化数据库：
+Initialize:
 
 ```bash
 npx tsx db/migrate.ts
 npx tsx db/seed.ts
 ```
 
-详细说明见 `DATABASE_SETUP.md`。
+See `DATABASE_SETUP.md` for full instructions.
 
-## JSON Fallback
+## JSON Fallback / JSON 降级
 
-当 `DATABASE_URL` 不存在或数据库不可用时，应用会 fallback 到：
+When `DATABASE_URL` is unavailable, the app reads from:
 
-```text
+```
 ../data/contents.json
 ../data/events.json
+../data/comments.json
 ```
 
-这保证本地 Demo 即使没有 PostgreSQL 也能运行。
+This ensures the demo runs locally without PostgreSQL. Do not delete the JSON
+fallback.
 
-## 已有功能
+## Routes / 路由
 
-- 首页 `/`
-- 发现页 `/discover`
-- 上传页 `/upload`
-- 内容详情页 `/content/[slug]`
-- 数据看板 `/dashboard`
-- UA 调试页 `/debug/ua`
-- AI JSON `/api/contents/[slug].json`
-- AI Index `/api/ai-index.json`
-- Stats API `/api/stats`
-- Events API `/api/events`
-- `llms.txt`
-- `robots.txt`
-- `sitemap.xml`
+| Route | Description |
+|---|---|
+| `/` | Homepage with live stats and dual-track concepts |
+| `/about` | Product explanation and AI permissions guide |
+| `/discover` | Content cards with Human + AI Metrics |
+| `/upload` | Publish content with AI permission controls |
+| `/content/[slug]` | Content detail with metrics, permissions, comments, events |
+| `/dashboard` | Traffic overview, event distribution, leaderboards |
+| `/admin` | Admin console: stats and recent events |
+| `/admin/contents` | Content management list |
+| `/admin/events` | Event log with analytics |
+| `/admin/comments` | Comment overview |
+| `/debug/ua` | UA classification debug page |
+| `/api/contents/[slug].json` | AI-readable JSON for single content |
+| `/api/ai-index.json` | Full AI-readable content index |
+| `/api/events` | Event creation and human view tracking |
+| `/api/stats` | Aggregate statistics |
+| `/api/comments` | Comment submission |
+| `/api/profiles` | Visitor profile management |
+| `/llms.txt` | AI platform instructions |
+| `/robots.txt` | Crawler rules with AI agent classification |
+| `/sitemap.xml` | Human pages + AI JSON URLs |
 
-## 相关文档
+## Documentation / 相关文档
 
-- `DATABASE_SETUP.md`：PostgreSQL / Drizzle 设置
-- `P0_TESTING.md`：P0 验收清单
-- `../PROJECT_STATUS.md`：项目阶段状态
+- `DATABASE_SETUP.md` — PostgreSQL + Drizzle setup
+- `P0_TESTING.md` — P0 acceptance checklist
+- `../docs/DEMO_GUIDE.md` — demo tour and limitations
+- `../docs/UI_COPY_STYLE_GUIDE.md` — bilingual copy rules
+- `../PROJECT_STATUS.md` — project phase status
+- `../DEPLOYMENT.md` — deployment guide

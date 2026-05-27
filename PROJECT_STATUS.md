@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P6-8 产品文案规范与中英双语统一整理完成并上线。
+P6-9 产品收尾与公开演示准备完成并上线。
 
 ## 线上地址
 
@@ -295,6 +295,15 @@ P6-8 产品文案规范与中英双语统一整理完成并上线。
 - 14 个文件改动，零业务逻辑修改
 - lint/build 通过，Vercel 已部署
 
+### P6-9 产品收尾与公开演示准备
+
+- 新增 `docs/DEMO_GUIDE.md` — 公开演示指南
+- 重写 `README.md` — 项目首页，含功能概览、技术栈、文档索引
+- 更新 `web/README.md` — 完整路由表、技术栈、相关文档链接
+- 更新 `DEPLOYMENT.md` — 添加 Demo Guide 和 Style Guide 链接
+- DEMO_GUIDE 包含：CoView 说明、演示地址、11 步推荐路径、核心功能清单、Demo 限制、安全说明、Roadmap
+- 所有文档仅修改文案，无业务逻辑、API、数据库、部署配置改动
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -321,13 +330,13 @@ P5-P6：产品完善与轻量互动系统。
 11. ~~About / Product Explanation 页面~~ ✅
 12. ~~产品视觉与中英双语统一整理~~ ✅
 13. ~~UI Copy Style Guide + Bilingual Polish~~ ✅
-14. 增加正式使用说明
+14. ~~增加正式使用说明（DEMO_GUIDE + README 重写）~~ ✅
 15. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
 16. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P6-9：产品收尾与公开演示准备，或管理后台认证保护规划。
+P7：管理后台认证保护、评论审核机制、AI Agent 评论模拟接口等后续规划。
 
 ## 注意事项
 
