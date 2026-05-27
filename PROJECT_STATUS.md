@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P5-6 事件日志和数据看板优化完成并上线。
+P6-1 Lightweight Visitor Profile 轻量访客身份系统完成并上线。
 
 ## 线上地址
 
@@ -158,6 +158,25 @@ P5-6 事件日志和数据看板优化完成并上线。
 - 不展示 token、`DATABASE_URL`、密码或 API Key
 - 未新增编辑、删除、修改数据库等危险操作
 
+### P6-1 Lightweight Visitor Profile 轻量访客身份系统
+
+- GitHub commit: ca6cca9 Add lightweight visitor profiles
+- Supabase migration 已完成
+- `profiles` 表已创建
+- `contents` 表已新增 `author_id` / `author_display_name`
+- `/upload` 显示 Current identity: CoViewer-xxxx
+- 发布新内容时能记录 `author_id` / `author_display_name`
+- 发布成功后显示 Published by CoViewer-xxxx
+- `/discover` 内容卡片显示 Posted by ...
+- `/content/{slug}` 详情页显示 Posted by ...
+- 旧 seed 内容 fallback 显示 CoView Demo Author
+- `/api/contents/{slug}.json` 已包含 author 信息
+- lint 通过
+- build 通过
+- 不涉及正式登录系统
+- 不涉及密码、邮箱、OAuth
+- 不涉及评论系统
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -167,7 +186,7 @@ P5-6 事件日志和数据看板优化完成并上线。
 
 ## 下一步建议
 
-P5：产品完善与安全整理（继续）。
+P6：轻量身份与互动系统。
 
 剩余任务：
 
@@ -176,13 +195,14 @@ P5：产品完善与安全整理（继续）。
 3. ~~优化内容详情页 Human Metrics / AI Metrics 展示~~ ✅
 4. ~~增加管理员后台或内容管理入口~~ ✅
 5. ~~优化事件日志 / 数据看板~~ ✅
-6. 增加正式使用说明
-7. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
-8. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+6. ~~Lightweight Visitor Profile 轻量访客身份系统~~ ✅
+7. 增加正式使用说明
+8. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
+9. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P5-7：上传页与发布流程优化，或 P5-7 管理后台认证保护规划。
+P6-2：Human Comments 人类评论系统。
 
 ## 注意事项
 
