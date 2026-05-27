@@ -5,10 +5,19 @@
  * Creates all tables if they don't exist, using raw SQL via pg Pool.
  */
 import { Pool } from "pg";
-import { getPgPoolConfig, logDatabaseError } from "./utils";
+import { getDatabaseUrl, getPgPoolConfig, logDatabaseError } from "./utils";
 
 const SQL = `
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  display_number INTEGER UNIQUE NOT NULL,
+  display_name TEXT UNIQUE NOT NULL,
+  profile_type TEXT DEFAULT 'human_guest' NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+  last_seen_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS contents (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -16,6 +25,8 @@ CREATE TABLE IF NOT EXISTS contents (
   title TEXT NOT NULL,
   body TEXT NOT NULL,
   tags TEXT[] DEFAULT '{}' NOT NULL,
+  author_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  author_display_name TEXT DEFAULT 'CoView Demo Author' NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT now() NOT NULL,
   ai_summary TEXT,
@@ -29,6 +40,16 @@ CREATE TABLE IF NOT EXISTS contents (
   allow_ai_cite BOOLEAN DEFAULT true NOT NULL,
   allow_ai_recommend BOOLEAN DEFAULT true NOT NULL
 );
+
+ALTER TABLE contents
+  ADD COLUMN IF NOT EXISTS author_id UUID REFERENCES profiles(id) ON DELETE SET NULL;
+
+ALTER TABLE contents
+  ADD COLUMN IF NOT EXISTS author_display_name TEXT DEFAULT 'CoView Demo Author' NOT NULL;
+
+UPDATE contents
+SET author_display_name = 'CoView Demo Author'
+WHERE author_display_name IS NULL OR author_display_name = '';
 
 CREATE TABLE IF NOT EXISTS content_metrics (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -81,7 +102,7 @@ CREATE TABLE IF NOT EXISTS ai_decisions (
 
 async function main() {
   const databaseUrl =
-    process.env.DATABASE_URL ??
+    getDatabaseUrl() ??
     "postgresql://postgres:postgres@localhost:5432/coview";
   console.log("Connecting to PostgreSQL...");
   const pool = new Pool(getPgPoolConfig(databaseUrl));

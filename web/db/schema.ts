@@ -10,12 +10,23 @@ import {
   numeric,
 } from "drizzle-orm/pg-core";
 
+export const profiles = pgTable("profiles", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  displayNumber: integer("display_number").unique().notNull(),
+  displayName: text("display_name").unique().notNull(),
+  profileType: text("profile_type").default("human_guest").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export const contents = pgTable("contents", {
   id: uuid("id").defaultRandom().primaryKey(),
   slug: text("slug").unique().notNull(),
   title: text("title").notNull(),
   body: text("body").notNull(),
   tags: text("tags").array().default([]).notNull(),
+  authorId: uuid("author_id").references(() => profiles.id, { onDelete: "set null" }),
+  authorDisplayName: text("author_display_name").default("CoView Demo Author").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 

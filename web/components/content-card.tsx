@@ -7,6 +7,7 @@ interface ContentCardProps {
   body: string;
   tags: string[];
   createdAt: string;
+  authorDisplayName?: string | null;
   aiSummary?: string | null;
   aiTags?: string[];
   humanViews: number;
@@ -58,6 +59,7 @@ export function ContentCard({
   body,
   tags,
   createdAt,
+  authorDisplayName,
   aiSummary,
   aiTags,
   humanViews,
@@ -106,6 +108,9 @@ export function ContentCard({
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2.5">
           <span className="text-xs text-slate-400">{displayDate}</span>
+          <span className="text-xs text-slate-400">
+            Posted by {authorDisplayName ?? "CoView Demo Author"}
+          </span>
           {displayTags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {displayTags.map((tag) => (

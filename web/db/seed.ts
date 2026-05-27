@@ -11,10 +11,10 @@ import { eq } from "drizzle-orm";
 import { createHash } from "crypto";
 import * as fs from "fs";
 import * as path from "path";
-import { getPgPoolConfig, logDatabaseError } from "./utils";
+import { getDatabaseUrl, getPgPoolConfig, logDatabaseError } from "./utils";
 
 const DATA_DIR = path.resolve(process.cwd(), "..", "data");
-const REQUIRED_TABLES = ["contents", "content_metrics", "events", "ai_decisions"];
+const REQUIRED_TABLES = ["profiles", "contents", "content_metrics", "events", "ai_decisions"];
 
 function readJSON(filename: string): any[] {
   const filePath = path.join(DATA_DIR, filename);
@@ -56,7 +56,7 @@ async function main() {
   console.log(`Found ${contents.length} contents, ${events.length} events`);
 
   const databaseUrl =
-    process.env.DATABASE_URL ??
+    getDatabaseUrl() ??
     "postgresql://postgres:postgres@localhost:5432/coview";
   const pool = new Pool(getPgPoolConfig(databaseUrl));
   const db = drizzle(pool, { schema });
@@ -87,6 +87,7 @@ async function main() {
         title: c.title,
         body: c.body,
         tags: c.tags ?? [],
+        authorDisplayName: c.author_display_name ?? "CoView Demo Author",
         createdAt: parseTime(c.created_at),
         updatedAt: parseTime(c.created_at),
         aiSummary: c.ai_summary ?? null,

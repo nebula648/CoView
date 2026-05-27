@@ -128,6 +128,9 @@ export default async function ContentDetailPage({
           <span className="text-sm text-slate-400">
             {formatDate(content.created_at)}
           </span>
+          <span className="text-sm text-slate-400">
+            Posted by {content.author_display_name ?? "CoView Demo Author"}
+          </span>
 
           {(content.tags ?? []).length > 0 && (
             <div className="flex flex-wrap gap-1">

@@ -1,8 +1,106 @@
 import { getDB } from "@/lib/db";
 import { schema } from "@/lib/db";
 import { eq, and, gte, desc, sql } from "drizzle-orm";
-import { readContents, readEvents, writeContents, writeEvents } from "@/lib/data-source";
+import {
+  readContents,
+  readEvents,
+  readProfiles,
+  writeContents,
+  writeEvents,
+  writeProfiles,
+} from "@/lib/data-source";
 import { hashUA, hashIP } from "@/lib/dedup";
+
+const DEFAULT_AUTHOR_NAME = "CoView Demo Author";
+
+/* ------------------------------------------------------------------ */
+/*  Lightweight Profiles                                                */
+/* ------------------------------------------------------------------ */
+
+export async function getProfileById(profileId: string): Promise<any | null> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.profiles)
+        .where(eq(schema.profiles.id, profileId))
+        .limit(1);
+      return rows.length > 0 ? mapDBProfile(rows[0]) : null;
+    },
+    () => {
+      const profiles = readProfiles();
+      return profiles.find((profile: any) => profile.id === profileId) ?? null;
+    },
+  );
+}
+
+export async function touchProfileLastSeen(profileId: string): Promise<void> {
+  const db = getDB();
+  if (db) {
+    try {
+      await db
+        .update(schema.profiles)
+        .set({ lastSeenAt: new Date() })
+        .where(eq(schema.profiles.id, profileId));
+      return;
+    } catch { /* fall through to JSON fallback */ }
+  }
+
+  const profiles = readProfiles();
+  const profile = profiles.find((p: any) => p.id === profileId);
+  if (profile) {
+    profile.last_seen_at = new Date().toISOString();
+    writeProfiles(profiles);
+  }
+}
+
+export async function createProfile(): Promise<{
+  id: string;
+  display_name: string;
+  profile_type: string;
+}> {
+  const db = getDB();
+  if (db) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const maxRows = await db
+          .select({
+            maxDisplayNumber: sql<number>`coalesce(max(${schema.profiles.displayNumber}), 0)`,
+          })
+          .from(schema.profiles);
+        const displayNumber = Number(maxRows[0]?.maxDisplayNumber ?? 0) + 1;
+        const displayName = formatCoViewerName(displayNumber);
+        const inserted = await db
+          .insert(schema.profiles)
+          .values({
+            displayNumber,
+            displayName,
+            profileType: "human_guest",
+          })
+          .returning();
+        return mapDBProfile(inserted[0]);
+      } catch {
+        // Retry possible display_number collisions from simultaneous first visits.
+      }
+    }
+  }
+
+  const profiles = readProfiles();
+  const displayNumber =
+    profiles.reduce((max: number, p: any) => Math.max(max, p.display_number ?? 0), 0) + 1;
+  const now = new Date().toISOString();
+  const profile = {
+    id: crypto.randomUUID(),
+    display_number: displayNumber,
+    display_name: formatCoViewerName(displayNumber),
+    profile_type: "human_guest",
+    created_at: now,
+    last_seen_at: now,
+  };
+  profiles.push(profile);
+  writeProfiles(profiles);
+  return profile;
+}
 
 /* ------------------------------------------------------------------ */
 /*  Content CRUD                                                        */
@@ -51,7 +149,8 @@ export async function getContentBySlug(slug: string): Promise<any | null> {
     },
     () => {
       const contents = readContents();
-      return contents.find((c: any) => c.id === slug) ?? null;
+      const content = contents.find((c: any) => c.id === slug);
+      return content ? ensureLegacyShape(content) : null;
     },
   );
 }
@@ -60,6 +159,8 @@ export async function createContent(payload: {
   title: string;
   body: string;
   tags: string[];
+  authorId?: string | null;
+  authorDisplayName?: string | null;
   allowAiView: boolean;
   allowAiSave: boolean;
   allowAiCite: boolean;
@@ -76,6 +177,8 @@ export async function createContent(payload: {
         title: payload.title,
         body: payload.body,
         tags: payload.tags,
+        authorId: payload.authorId ?? null,
+        authorDisplayName: payload.authorDisplayName ?? DEFAULT_AUTHOR_NAME,
         allowAiView: payload.allowAiView,
         allowAiSave: payload.allowAiSave,
         allowAiCite: payload.allowAiCite,
@@ -92,6 +195,8 @@ export async function createContent(payload: {
     title: payload.title,
     body: payload.body,
     tags: payload.tags,
+    author_id: payload.authorId ?? null,
+    author_display_name: payload.authorDisplayName ?? DEFAULT_AUTHOR_NAME,
     created_at: new Date().toISOString().replace("T", " ").substring(0, 19),
     metrics: { human_views: 0, human_likes: 0, human_saves: 0, ai_views: 0, ai_saves: 0, ai_citations: 0 },
     ai_summary: "尚未生成 AI Summary。",
@@ -677,6 +782,8 @@ function mapDBContent(row: any): any {
     title: row.title,
     body: row.body,
     tags: row.tags ?? [],
+    author_id: row.authorId ?? null,
+    author_display_name: row.authorDisplayName ?? DEFAULT_AUTHOR_NAME,
     created_at: row.createdAt
       ? new Date(row.createdAt).toISOString().replace("T", " ").substring(0, 19)
       : "",
@@ -729,6 +836,8 @@ function ensureLegacyShape(c: any): any {
   return {
     ...c,
     tags: c.tags ?? [],
+    author_id: c.author_id ?? null,
+    author_display_name: c.author_display_name ?? DEFAULT_AUTHOR_NAME,
     metrics: c.metrics ?? { human_views: 0, human_likes: 0, human_saves: 0, ai_views: 0, ai_saves: 0, ai_citations: 0 },
     ai_summary: c.ai_summary ?? "尚未生成 AI Summary。",
     ai_tags: c.ai_tags ?? [],
@@ -738,6 +847,25 @@ function ensureLegacyShape(c: any): any {
     ai_reason: c.ai_reason ?? "尚未生成 AI Reason。",
     ai_recommendations: c.ai_recommendations ?? c.metrics?.ai_recommendations ?? 0,
   };
+}
+
+function mapDBProfile(row: any): any {
+  return {
+    id: row.id,
+    display_number: row.displayNumber,
+    display_name: row.displayName,
+    profile_type: row.profileType,
+    created_at: row.createdAt
+      ? new Date(row.createdAt).toISOString()
+      : "",
+    last_seen_at: row.lastSeenAt
+      ? new Date(row.lastSeenAt).toISOString()
+      : "",
+  };
+}
+
+function formatCoViewerName(displayNumber: number): string {
+  return `CoViewer-${String(displayNumber).padStart(4, "0")}`;
 }
 
 function normalizeLegacyEvent(event: any): any {

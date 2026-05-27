@@ -10,7 +10,17 @@ export async function POST(request: NextRequest) {
 
   // Action: create_content (from upload page)
   if (body.action === "create_content") {
-    const { title, body: bodyText, tags, allowAiView, allowAiSave, allowAiCite, allowAiRecommend } = body;
+    const {
+      title,
+      body: bodyText,
+      tags,
+      authorId,
+      authorDisplayName,
+      allowAiView,
+      allowAiSave,
+      allowAiCite,
+      allowAiRecommend,
+    } = body;
     if (!title?.trim() || !bodyText?.trim()) {
       return NextResponse.json({ error: "Title and body are required" }, { status: 400 });
     }
@@ -19,6 +29,8 @@ export async function POST(request: NextRequest) {
       title: title.trim(),
       body: bodyText.trim(),
       tags: tags ?? [],
+      authorId: authorId ?? null,
+      authorDisplayName: authorDisplayName ?? null,
       allowAiView: allowAiView ?? true,
       allowAiSave: allowAiSave ?? true,
       allowAiCite: allowAiCite ?? true,

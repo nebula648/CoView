@@ -42,8 +42,15 @@ export async function GET(
     "@type": "Article",
     headline: content.title,
     datePublished: content.created_at,
-    author: { "@type": "Organization", name: "CoView" },
+    author: {
+      "@type": "Person",
+      name: content.author_display_name ?? "CoView Demo Author",
+    },
     "coView:contentId": content.id,
+    "coView:author": {
+      displayName: content.author_display_name ?? "CoView Demo Author",
+      ...(content.author_id ? { profileId: content.author_id } : {}),
+    },
     "coView:title": content.title,
     "coView:body": content.body,
     "coView:originalTags": content.tags ?? [],

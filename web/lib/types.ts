@@ -20,8 +20,12 @@ export interface AiReadableContent {
   "@type": "Article";
   headline: string;
   datePublished: string;
-  author: { "@type": "Organization"; name: string };
+  author: { "@type": "Person"; name: string };
   "coView:contentId": string;
+  "coView:author": {
+    displayName: string;
+    profileId?: string;
+  };
   "coView:title": string;
   "coView:body": string;
   "coView:originalTags": string[];

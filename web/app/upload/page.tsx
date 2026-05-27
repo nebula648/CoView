@@ -1,10 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  ensureVisitorProfile,
+  type VisitorProfile,
+} from "@/lib/visitor-profile";
 
 type Status =
-  | { type: "success"; msg: string; id: string; title: string; allowAiView: boolean }
+  | {
+      type: "success";
+      msg: string;
+      id: string;
+      title: string;
+      allowAiView: boolean;
+      authorDisplayName: string;
+    }
   | { type: "error"; msg: string };
 
 const PERMISSIONS = [
@@ -39,11 +50,36 @@ export default function UploadPage() {
   const [allowAiCite, setAllowAiCite] = useState(true);
   const [allowAiRecommend, setAllowAiRecommend] = useState(true);
   const [status, setStatus] = useState<Status | null>(null);
+  const [profile, setProfile] = useState<VisitorProfile | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   const parsedTags = tagsText
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
+
+  useEffect(() => {
+    let isMounted = true;
+    ensureVisitorProfile()
+      .then((visitorProfile) => {
+        if (isMounted) setProfile(visitorProfile);
+      })
+      .catch(() => {
+        if (isMounted) {
+          setStatus({
+            type: "error",
+            msg: "Unable to create your visitor identity. Please refresh and try again.",
+          });
+        }
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingProfile(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,6 +96,20 @@ export default function UploadPage() {
       return;
     }
 
+    let activeProfile = profile;
+    if (!activeProfile) {
+      try {
+        activeProfile = await ensureVisitorProfile();
+        setProfile(activeProfile);
+      } catch {
+        setStatus({
+          type: "error",
+          msg: "Unable to create your visitor identity. Please refresh and try again.",
+        });
+        return;
+      }
+    }
+
     const res = await fetch("/api/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -68,6 +118,8 @@ export default function UploadPage() {
         title: cleanTitle,
         body: cleanBody,
         tags: parsedTags,
+        authorId: activeProfile.profileId,
+        authorDisplayName: activeProfile.displayName,
         allowAiView,
         allowAiSave,
         allowAiCite,
@@ -83,6 +135,7 @@ export default function UploadPage() {
         id: result.id,
         title: cleanTitle,
         allowAiView,
+        authorDisplayName: activeProfile.displayName,
       });
       setTitle("");
       setBody("");
@@ -130,6 +183,11 @@ export default function UploadPage() {
           CoView lets you decide whether AI agents can view, save, cite, or
           recommend your content.
         </p>
+        <div className="mt-5 inline-flex rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-slate-100">
+          {isLoadingProfile
+            ? "Loading identity..."
+            : `Current identity: ${profile?.displayName ?? "Unknown visitor"}`}
+        </div>
       </section>
 
       <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_320px]">
@@ -302,6 +360,9 @@ export default function UploadPage() {
                 {status.msg}
               </p>
               <p className="mt-1 text-sm text-emerald-700">{status.title}</p>
+              <p className="mt-1 text-xs font-medium text-emerald-700">
+                Published by {status.authorDisplayName}
+              </p>
               <div className="mt-4 grid gap-2">
                 <Link
                   href={`/content/${status.id}`}
