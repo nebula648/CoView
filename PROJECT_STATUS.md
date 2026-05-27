@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P5-5 管理后台 / 内容管理入口完成并上线。
+P5-6 事件日志和数据看板优化完成并上线。
 
 ## 线上地址
 
@@ -141,6 +141,23 @@ P5-5 管理后台 / 内容管理入口完成并上线。
 - 后台页面已添加 `noindex` / `nofollow`，避免搜索引擎索引 `/admin`、`/admin/contents`、`/admin/events`
 - 原有公开页面和 API 未被破坏
 
+### P5-6 事件日志和数据看板优化
+
+- GitHub commit: 3139366 Improve event analytics dashboard
+- Vercel 最新部署状态 Ready / Current
+- `/dashboard` 已增强
+- `/admin/events` 已增强
+- Dashboard 新增 Traffic Overview
+- Dashboard 新增 Human vs AI attention ratio
+- Dashboard 新增 Event Type Distribution
+- Dashboard 新增 Content Leaderboards
+- Dashboard 新增 Recent Events Summary
+- `/admin/events` 展示 Total Events、Human Events、AI Agent Events、Crawler Events、Bot Events、Event Type Summary、Recent 50 Events
+- 不展示完整 IP
+- 不展示原始 user agent
+- 不展示 token、`DATABASE_URL`、密码或 API Key
+- 未新增编辑、删除、修改数据库等危险操作
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -158,14 +175,14 @@ P5：产品完善与安全整理（继续）。
 2. ~~优化发现页内容卡片~~ ✅
 3. ~~优化内容详情页 Human Metrics / AI Metrics 展示~~ ✅
 4. ~~增加管理员后台或内容管理入口~~ ✅
-5. 优化事件日志 / 数据看板
+5. ~~优化事件日志 / 数据看板~~ ✅
 6. 增加正式使用说明
 7. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
 8. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P5-6：事件日志和数据看板优化。
+P5-7：上传页与发布流程优化，或 P5-7 管理后台认证保护规划。
 
 ## 注意事项
 
