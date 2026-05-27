@@ -3,9 +3,6 @@ import * as path from "path";
 import { inspect } from "util";
 import type { PoolConfig } from "pg";
 
-const DEFAULT_DATABASE_URL =
-  "postgresql://postgres:postgres@localhost:5432/coview";
-
 export function loadEnvLocal(): void {
   const envPath = path.resolve(process.cwd(), ".env.local");
   if (!fs.existsSync(envPath)) return;
@@ -33,9 +30,9 @@ export function loadEnvLocal(): void {
   }
 }
 
-export function getDatabaseUrl(): string {
+export function getDatabaseUrl(): string | undefined {
   loadEnvLocal();
-  return process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL;
+  return process.env.DATABASE_URL;
 }
 
 export function getSslConfigForDatabaseUrl(databaseUrl: string): PoolConfig["ssl"] {
@@ -57,14 +54,16 @@ export function getSslConfigForDatabaseUrl(databaseUrl: string): PoolConfig["ssl
 }
 
 export function getPgPoolConfig(
-  databaseUrl = getDatabaseUrl(),
+  databaseUrl: string | undefined = getDatabaseUrl(),
   max = 1,
 ): PoolConfig {
-  const ssl = getSslConfigForDatabaseUrl(databaseUrl);
+  const url = databaseUrl ?? "";
+  const ssl = getSslConfigForDatabaseUrl(url);
   return {
-    connectionString: ssl ? removeSslMode(databaseUrl) : databaseUrl,
+    connectionString: ssl ? removeSslMode(url) : url,
     max,
     ssl,
+    connectionTimeoutMillis: 5000,
   };
 }
 

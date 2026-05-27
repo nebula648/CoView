@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getAllContents } from "@/lib/repository";
 
+export const runtime = "nodejs";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";

@@ -80,8 +80,11 @@ CREATE TABLE IF NOT EXISTS ai_decisions (
 `;
 
 async function main() {
+  const databaseUrl =
+    process.env.DATABASE_URL ??
+    "postgresql://postgres:postgres@localhost:5432/coview";
   console.log("Connecting to PostgreSQL...");
-  const pool = new Pool(getPgPoolConfig());
+  const pool = new Pool(getPgPoolConfig(databaseUrl));
 
   try {
     await pool.query("SELECT 1");

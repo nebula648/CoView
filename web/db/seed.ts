@@ -55,7 +55,10 @@ async function main() {
 
   console.log(`Found ${contents.length} contents, ${events.length} events`);
 
-  const pool = new Pool(getPgPoolConfig());
+  const databaseUrl =
+    process.env.DATABASE_URL ??
+    "postgresql://postgres:postgres@localhost:5432/coview";
+  const pool = new Pool(getPgPoolConfig(databaseUrl));
   const db = drizzle(pool, { schema });
 
   try {
