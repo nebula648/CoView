@@ -54,7 +54,7 @@ export default function UploadPage() {
   const [allowAiSave, setAllowAiSave] = useState(true);
   const [allowAiCite, setAllowAiCite] = useState(true);
   const [allowAiRecommend, setAllowAiRecommend] = useState(true);
-  const [allowAiComment, setAllowAiComment] = useState(false);
+  const [allowAiComment, setAllowAiComment] = useState(true);
   const [status, setStatus] = useState<Status | null>(null);
   const [profile, setProfile] = useState<VisitorProfile | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -151,7 +151,7 @@ export default function UploadPage() {
       setAllowAiSave(true);
       setAllowAiCite(true);
       setAllowAiRecommend(true);
-      setAllowAiComment(false);
+      setAllowAiComment(true);
     } else {
       setStatus({
         type: "error",
