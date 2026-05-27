@@ -84,7 +84,14 @@ or unavailable.
 
 ## Deploy to Vercel
 
-1. Create a Vercel project from the `web/` app directory.
+1. Create a Vercel project and set **Root Directory** to:
+
+```text
+web
+```
+
+The Next.js production app lives in `web/`, not the repository root.
+
 2. Set the build command:
 
 ```bash
@@ -98,6 +105,7 @@ DATABASE_URL=your PostgreSQL connection string
 NEXT_PUBLIC_SITE_URL=https://your-vercel-domain
 ```
 
+After deployment, update `NEXT_PUBLIC_SITE_URL` to the real production domain.
 Do not commit these values to Git.
 
 4. Before or after first deploy, initialize the database from your local machine:
