@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P6-1 Lightweight Visitor Profile 轻量访客身份系统完成并上线。
+P6-2 Human Comments 人类评论系统完成并上线。
 
 ## 线上地址
 
@@ -177,6 +177,27 @@ P6-1 Lightweight Visitor Profile 轻量访客身份系统完成并上线。
 - 不涉及密码、邮箱、OAuth
 - 不涉及评论系统
 
+### P6-2 Human Comments 人类评论系统
+
+- GitHub commit: f06d938 Add human comments system
+- Vercel 已部署完成
+- `comments` 表已创建
+- `/api/comments` 可用
+- 内容详情页底部已接入评论区
+- 当前 CoViewer 身份可以发表评论
+- 评论显示 `author_display_name`
+- 评论显示 Human badge
+- Supabase comments 表已有评论记录
+- Supabase events 表已有 `human_comment` 事件
+- JSON fallback 已兼容 `data/comments.json`
+- lint 通过
+- build 通过
+- migration 通过
+- 不涉及 AI 评论
+- 不涉及正式登录系统
+- 不涉及评论删除/编辑
+- 不涉及复杂审核后台
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -196,13 +217,14 @@ P6：轻量身份与互动系统。
 4. ~~增加管理员后台或内容管理入口~~ ✅
 5. ~~优化事件日志 / 数据看板~~ ✅
 6. ~~Lightweight Visitor Profile 轻量访客身份系统~~ ✅
-7. 增加正式使用说明
-8. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
-9. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+7. ~~Human Comments 人类评论系统~~ ✅
+8. 增加正式使用说明
+9. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
+10. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P6-2：Human Comments 人类评论系统。
+P6-3：AI Comment Permission AI 评论权限系统。
 
 ## 注意事项
 
