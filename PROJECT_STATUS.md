@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P6-5 管理后台评论查看与审核预留完成并上线。
+P6-6 About / Product Explanation 页面完成并上线。
 
 ## 线上地址
 
@@ -251,6 +251,29 @@ P6-5 管理后台评论查看与审核预留完成并上线。
 - lint 通过
 - build 通过
 
+### P6-6 About / Product Explanation 页面
+
+- GitHub commit: 7ebbbf4 Add about page for CoView
+- 新增 `web/app/about/page.tsx`
+- 修改 `web/components/sidebar.tsx`
+- 修改 `web/app/page.tsx`
+- `/about` 页面已上线
+- 侧边栏已新增 关于 / About
+- 首页 Hero 已新增 About 入口
+- 首页底部 CTA 已新增 About 入口
+- About 页面包含 What is CoView?
+- About 页面包含 Why Human + AI Co-Reading?
+- About 页面包含 Core Features
+- About 页面包含 AI Permissions Explained
+- About 页面包含 What CoView is not
+- About 页面包含 Roadmap
+- lint 通过
+- build 通过
+- 不涉及数据库 schema 修改
+- 不涉及真实 AI API
+- 不涉及正式登录系统
+- 不涉及上传、评论、后台业务逻辑修改
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -274,13 +297,14 @@ P6：轻量身份与互动系统。
 8. ~~AI Comment Permission AI 评论权限系统~~ ✅
 9. ~~评论区体验优化~~ ✅
 10. ~~管理后台评论查看与审核预留~~ ✅
-11. 增加正式使用说明
-12. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
-13. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+11. ~~About / Product Explanation 页面~~ ✅
+12. 增加正式使用说明
+13. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
+14. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P6-6：评论审核状态与管理后台预留，或 AI Agent 评论模拟接口规划。
+P6-7：管理后台认证保护规划，或产品视觉与中英双语统一整理。
 
 ## 注意事项
 
