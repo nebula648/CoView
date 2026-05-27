@@ -4,6 +4,7 @@ export type EventType =
   | "human_view"
   | "human_like"
   | "human_save"
+  | "human_comment"
   | "ai_agent_view"
   | "ai_agent_save"
   | "ai_agent_cite"
@@ -14,6 +15,17 @@ export type EventType =
   | "unknown_bot_view";
 
 export type CitationSuitability = "Low" | "Medium" | "High";
+
+export interface Comment {
+  id: string;
+  content_id: string;
+  author_id: string | null;
+  author_display_name: string;
+  actor_type: "human";
+  body: string;
+  status: "visible";
+  created_at: string;
+}
 
 export interface AiReadableContent {
   "@context": Record<string, string>;

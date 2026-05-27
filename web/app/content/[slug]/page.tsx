@@ -1,6 +1,11 @@
-import { getContentBySlug, getEventsByContent } from "@/lib/repository";
+import {
+  getCommentsByContentId,
+  getContentBySlug,
+  getEventsByContent,
+} from "@/lib/repository";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { CommentSection } from "@/components/comment-section";
 import { HumanViewTracker } from "./human-view-tracker";
 
 export const dynamic = "force-dynamic";
@@ -102,6 +107,7 @@ export default async function ContentDetailPage({
   if (!content) notFound();
 
   const events = await getEventsByContent(content.id);
+  const comments = await getCommentsByContentId(content.id);
   const m = content.metrics ?? {};
 
   return (
@@ -355,6 +361,8 @@ export default async function ContentDetailPage({
           agent), ensuring metrics reflect genuine attention.
         </p>
       </section>
+
+      <CommentSection contentId={content.id} initialComments={comments} />
     </div>
   );
 }

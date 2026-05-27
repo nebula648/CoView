@@ -86,6 +86,21 @@ CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type);
 CREATE INDEX IF NOT EXISTS idx_events_time ON events(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_events_dedup ON events(user_agent_hash, ip_hash, content_id, created_at);
 
+CREATE TABLE IF NOT EXISTS comments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  content_id UUID NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
+  author_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  author_display_name TEXT NOT NULL,
+  actor_type TEXT DEFAULT 'human' NOT NULL,
+  body TEXT NOT NULL,
+  status TEXT DEFAULT 'visible' NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_comments_content ON comments(content_id);
+CREATE INDEX IF NOT EXISTS idx_comments_status ON comments(status);
+CREATE INDEX IF NOT EXISTS idx_comments_time ON comments(created_at DESC);
+
 CREATE TABLE IF NOT EXISTS ai_decisions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   content_id UUID NOT NULL REFERENCES contents(id) ON DELETE CASCADE,

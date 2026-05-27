@@ -94,6 +94,27 @@ export const events = pgTable(
   ],
 );
 
+export const comments = pgTable(
+  "comments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    contentId: uuid("content_id")
+      .references(() => contents.id, { onDelete: "cascade" })
+      .notNull(),
+    authorId: uuid("author_id").references(() => profiles.id, { onDelete: "set null" }),
+    authorDisplayName: text("author_display_name").notNull(),
+    actorType: text("actor_type").default("human").notNull(),
+    body: text("body").notNull(),
+    status: text("status").default("visible").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_comments_content").on(table.contentId),
+    index("idx_comments_status").on(table.status),
+    index("idx_comments_time").on(table.createdAt.desc()),
+  ],
+);
+
 export const aiDecisions = pgTable("ai_decisions", {
   id: uuid("id").defaultRandom().primaryKey(),
   contentId: uuid("content_id")

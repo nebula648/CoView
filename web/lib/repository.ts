@@ -2,9 +2,11 @@ import { getDB } from "@/lib/db";
 import { schema } from "@/lib/db";
 import { eq, and, gte, desc, sql } from "drizzle-orm";
 import {
+  readComments,
   readContents,
   readEvents,
   readProfiles,
+  writeComments,
   writeContents,
   writeEvents,
   writeProfiles,
@@ -405,6 +407,112 @@ export async function findDuplicateAiAgentView(
       );
     },
   );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Comments                                                            */
+/* ------------------------------------------------------------------ */
+
+export async function getCommentsByContentId(contentId: string): Promise<any[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.comments)
+        .where(
+          and(
+            eq(schema.comments.contentId, contentId),
+            eq(schema.comments.status, "visible"),
+          ),
+        )
+        .orderBy(desc(schema.comments.createdAt));
+
+      return rows.map(mapDBComment);
+    },
+    () => {
+      const comments = readComments();
+      return comments
+        .filter(
+          (comment: any) =>
+            comment.content_id === contentId &&
+            (comment.status ?? "visible") === "visible",
+        )
+        .map(ensureCommentShape)
+        .sort(
+          (a: any, b: any) =>
+            new Date(b.created_at).getTime() -
+            new Date(a.created_at).getTime(),
+        );
+    },
+  );
+}
+
+export async function createComment(payload: {
+  contentId: string;
+  authorId?: string | null;
+  authorDisplayName: string;
+  body: string;
+}): Promise<any> {
+  const commentBody = payload.body.trim();
+  const authorDisplayName = payload.authorDisplayName.trim() || DEFAULT_AUTHOR_NAME;
+  const db = getDB();
+
+  if (db) {
+    try {
+      const inserted = await db
+        .insert(schema.comments)
+        .values({
+          contentId: payload.contentId,
+          authorId: payload.authorId ?? null,
+          authorDisplayName,
+          actorType: "human",
+          body: commentBody,
+          status: "visible",
+        })
+        .returning();
+
+      const comment = mapDBComment(inserted[0]);
+      await createEvent({
+        contentId: payload.contentId,
+        eventType: "human_comment",
+        actorType: "human",
+        extraFields: {
+          author_id: payload.authorId ?? null,
+          author_display_name: authorDisplayName,
+          comment_id: comment.id,
+        },
+      });
+      return comment;
+    } catch { /* fall through to JSON fallback */ }
+  }
+
+  const comments = readComments();
+  const now = new Date().toISOString().replace("T", " ").substring(0, 19);
+  const comment = {
+    id: crypto.randomUUID(),
+    content_id: payload.contentId,
+    author_id: payload.authorId ?? null,
+    author_display_name: authorDisplayName,
+    actor_type: "human",
+    body: commentBody,
+    status: "visible",
+    created_at: now,
+  };
+  comments.push(comment);
+  writeComments(comments);
+
+  await createEvent({
+    contentId: payload.contentId,
+    eventType: "human_comment",
+    actorType: "human",
+    extraFields: {
+      author_id: payload.authorId ?? null,
+      author_display_name: authorDisplayName,
+      comment_id: comment.id,
+    },
+  });
+
+  return comment;
 }
 
 /* ------------------------------------------------------------------ */
@@ -861,6 +969,37 @@ function mapDBProfile(row: any): any {
     last_seen_at: row.lastSeenAt
       ? new Date(row.lastSeenAt).toISOString()
       : "",
+  };
+}
+
+function mapDBComment(row: any): any {
+  return {
+    id: row.id,
+    content_id: row.contentId,
+    author_id: row.authorId ?? null,
+    author_display_name: row.authorDisplayName,
+    actor_type: row.actorType,
+    body: row.body,
+    status: row.status,
+    created_at: row.createdAt
+      ? new Date(row.createdAt).toISOString().replace("T", " ").substring(0, 19)
+      : "",
+  };
+}
+
+function ensureCommentShape(comment: any): any {
+  return {
+    id: comment.id ?? comment.comment_id ?? crypto.randomUUID(),
+    content_id: comment.content_id,
+    author_id: comment.author_id ?? null,
+    author_display_name: comment.author_display_name ?? DEFAULT_AUTHOR_NAME,
+    actor_type: "human",
+    body: comment.body ?? "",
+    status: comment.status ?? "visible",
+    created_at:
+      comment.created_at ??
+      comment.timestamp ??
+      new Date().toISOString().replace("T", " ").substring(0, 19),
   };
 }
 

@@ -21,6 +21,12 @@ export function readProfiles() {
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
 
+export function readComments() {
+  const filePath = path.join(DATA_DIR, "comments.json");
+  if (!fs.existsSync(filePath)) return [];
+  return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+}
+
 export function writeContents(data: unknown) {
   const filePath = path.join(DATA_DIR, "contents.json");
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -35,6 +41,12 @@ export function writeEvents(data: unknown) {
 
 export function writeProfiles(data: unknown) {
   const filePath = path.join(DATA_DIR, "profiles.json");
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+export function writeComments(data: unknown) {
+  const filePath = path.join(DATA_DIR, "comments.json");
   fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
