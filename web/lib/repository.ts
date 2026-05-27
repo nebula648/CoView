@@ -353,8 +353,8 @@ export async function getRecentEvents(limit: number = 50): Promise<any[]> {
         event_id: row.event.id,
         content_id: row.event.contentId,
         content_title: row.contentTitle ?? null,
-        event_type: row.event.eventType,
-        actor_type: row.event.actorType,
+        event_type: normalizeAnalyticsEventType(row.event.eventType),
+        actor_type: normalizeActorType(row.event.actorType),
         session_id: row.event.sessionId,
         user_agent_hash: row.event.userAgentHash,
         ip_hash: row.event.ipHash,
@@ -373,8 +373,72 @@ export async function getRecentEvents(limit: number = 50): Promise<any[]> {
         .slice(0, limit)
         .map((e: any) => {
           const c = contents.find((x: any) => x.id === e.content_id);
+          return {
+            ...e,
+            event_type: normalizeAnalyticsEventType(e.event_type),
+            actor_type: normalizeActorType(e.actor_type),
+            content_title: c?.title ?? null,
+          };
+        });
+    },
+  );
+}
+
+export async function getEventAnalytics(): Promise<{
+  totalEvents: number;
+  actorCounts: Record<string, number>;
+  eventTypeCounts: Record<string, number>;
+  recentEvents: any[];
+}> {
+  const trackedEventTypes = [
+    "human_view",
+    "ai_agent_view",
+    "search_crawler_view",
+    "unknown_bot_view",
+    "ai_agent_save",
+    "ai_agent_citation",
+    "ai_agent_recommendation",
+    "ai_action_blocked",
+  ];
+
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select({
+          event: schema.events,
+          contentTitle: schema.contents.title,
+        })
+        .from(schema.events)
+        .leftJoin(schema.contents, eq(schema.events.contentId, schema.contents.id))
+        .orderBy(desc(schema.events.createdAt));
+      return buildEventAnalytics(
+        rows.map((row: any) => ({
+          event_id: row.event.id,
+          content_id: row.event.contentId,
+          content_title: row.contentTitle ?? null,
+          event_type: row.event.eventType,
+          actor_type: row.event.actorType,
+          session_id: row.event.sessionId,
+          user_agent_hash: row.event.userAgentHash,
+          ip_hash: row.event.ipHash,
+          route_accessed: row.event.routeAccessed,
+          timestamp: row.event.createdAt
+            ? new Date(row.event.createdAt).toISOString().replace("T", " ").substring(0, 19)
+            : "",
+        })),
+        trackedEventTypes,
+      );
+    },
+    () => {
+      const contents = readContents();
+      const events = readEvents()
+        .map(normalizeLegacyEvent)
+        .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .map((e: any) => {
+          const c = contents.find((x: any) => x.id === e.content_id);
           return { ...e, content_title: c?.title ?? null };
         });
+      return buildEventAnalytics(events, trackedEventTypes);
     },
   );
 }
@@ -387,11 +451,15 @@ export async function getStats(): Promise<{
   totalContents: number;
   totalHumanViews: number;
   totalAiAgentViews: number;
+  totalSearchCrawlerViews: number;
+  totalUnknownBotViews: number;
   totalAiSaves: number;
   totalAiCitations: number;
   totalEvents: number;
   humanEvents: number;
   aiEvents: number;
+  crawlerEvents: number;
+  botEvents: number;
   allowAiViewCount: number;
   forbidAiViewCount: number;
 }> {
@@ -402,17 +470,23 @@ export async function getStats(): Promise<{
       const events = await db.select().from(schema.events);
       const totalHumanViews = metrics.reduce((s: number, m: any) => s + (m.humanViews ?? 0), 0);
       const totalAiAgentViews = metrics.reduce((s: number, m: any) => s + (m.aiAgentViews ?? 0), 0);
+      const totalSearchCrawlerViews = metrics.reduce((s: number, m: any) => s + (m.searchCrawlerViews ?? 0), 0);
+      const totalUnknownBotViews = metrics.reduce((s: number, m: any) => s + (m.unknownBotViews ?? 0), 0);
       const totalAiSaves = metrics.reduce((s: number, m: any) => s + (m.aiAgentSaves ?? 0), 0);
       const totalAiCitations = metrics.reduce((s: number, m: any) => s + (m.aiAgentCitations ?? 0), 0);
       return {
         totalContents: contents.length,
         totalHumanViews,
         totalAiAgentViews,
+        totalSearchCrawlerViews,
+        totalUnknownBotViews,
         totalAiSaves,
         totalAiCitations,
         totalEvents: events.length,
-        humanEvents: events.filter((e: any) => e.actorType === "human").length,
-        aiEvents: events.filter((e: any) => e.actorType === "ai_agent").length,
+        humanEvents: events.filter((e: any) => normalizeActorType(e.actorType) === "human").length,
+        aiEvents: events.filter((e: any) => normalizeActorType(e.actorType) === "ai_agent").length,
+        crawlerEvents: events.filter((e: any) => normalizeActorType(e.actorType) === "search_crawler").length,
+        botEvents: events.filter((e: any) => normalizeActorType(e.actorType) === "unknown_bot").length,
         allowAiViewCount: contents.filter((c: any) => c.allowAiView).length,
         forbidAiViewCount: contents.filter((c: any) => !c.allowAiView).length,
       };
@@ -422,17 +496,23 @@ export async function getStats(): Promise<{
       const events = readEvents();
       const totalHumanViews = contents.reduce((s: number, c: any) => s + (c.metrics?.human_views ?? 0), 0);
       const totalAiViews = contents.reduce((s: number, c: any) => s + (c.metrics?.ai_views ?? 0), 0);
+      const totalSearchCrawlerViews = events.filter((e: any) => normalizeActorType(e.actor_type) === "search_crawler").length;
+      const totalUnknownBotViews = events.filter((e: any) => normalizeActorType(e.actor_type) === "unknown_bot").length;
       const totalAiSaves = contents.reduce((s: number, c: any) => s + (c.metrics?.ai_saves ?? 0), 0);
       const totalAiCitations = contents.reduce((s: number, c: any) => s + (c.metrics?.ai_citations ?? 0), 0);
       return {
         totalContents: contents.length,
         totalHumanViews,
         totalAiAgentViews: totalAiViews,
+        totalSearchCrawlerViews,
+        totalUnknownBotViews,
         totalAiSaves,
         totalAiCitations,
         totalEvents: events.length,
         humanEvents: events.filter((e: any) => e.actor_type === "human").length,
         aiEvents: events.filter((e: any) => normalizeActorType(e.actor_type) === "ai_agent").length,
+        crawlerEvents: events.filter((e: any) => normalizeActorType(e.actor_type) === "search_crawler").length,
+        botEvents: events.filter((e: any) => normalizeActorType(e.actor_type) === "unknown_bot").length,
         allowAiViewCount: contents.filter((c: any) => c.allow_ai_view ?? true).length,
         forbidAiViewCount: contents.filter((c: any) => !(c.allow_ai_view ?? true)).length,
       };
@@ -640,6 +720,8 @@ function mapDBMetrics(row: any): any {
     ai_saves: row.aiAgentSaves ?? 0,
     ai_citations: row.aiAgentCitations ?? 0,
     ai_recommendations: row.aiRecommendations ?? 0,
+    search_crawler_views: row.searchCrawlerViews ?? 0,
+    unknown_bot_views: row.unknownBotViews ?? 0,
   };
 }
 
@@ -678,4 +760,52 @@ function normalizeEventType(eventType: string | undefined): string | undefined {
   if (eventType === "ai_save") return "ai_agent_save";
   if (eventType === "ai_citation") return "ai_agent_cite";
   return eventType;
+}
+
+function normalizeAnalyticsEventType(eventType: string | undefined): string {
+  if (eventType === "ai_view") return "ai_agent_view";
+  if (eventType === "ai_save") return "ai_agent_save";
+  if (eventType === "ai_citation" || eventType === "ai_agent_cite") {
+    return "ai_agent_citation";
+  }
+  if (eventType === "ai_recommendation") return "ai_agent_recommendation";
+  return eventType ?? "unknown_event";
+}
+
+function buildEventAnalytics(
+  events: any[],
+  trackedEventTypes: string[],
+): {
+  totalEvents: number;
+  actorCounts: Record<string, number>;
+  eventTypeCounts: Record<string, number>;
+  recentEvents: any[];
+} {
+  const actorCounts: Record<string, number> = {
+    human: 0,
+    ai_agent: 0,
+    search_crawler: 0,
+    unknown_bot: 0,
+  };
+  const eventTypeCounts: Record<string, number> = Object.fromEntries(
+    trackedEventTypes.map((eventType) => [eventType, 0]),
+  );
+
+  const normalizedEvents = events.map((event) => ({
+    ...event,
+    actor_type: normalizeActorType(event.actor_type) ?? "unknown",
+    event_type: normalizeAnalyticsEventType(event.event_type),
+  }));
+
+  for (const event of normalizedEvents) {
+    actorCounts[event.actor_type] = (actorCounts[event.actor_type] ?? 0) + 1;
+    eventTypeCounts[event.event_type] = (eventTypeCounts[event.event_type] ?? 0) + 1;
+  }
+
+  return {
+    totalEvents: normalizedEvents.length,
+    actorCounts,
+    eventTypeCounts,
+    recentEvents: normalizedEvents.slice(0, 8),
+  };
 }
