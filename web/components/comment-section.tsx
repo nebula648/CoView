@@ -32,6 +32,8 @@ export function CommentSection({
   );
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const humanComments = comments.filter((comment) => comment.actor_type === "human");
+  const aiAgentComments = comments.filter((comment) => comment.actor_type === "ai_agent");
 
   function actorBadge(actorType: "human" | "ai_agent") {
     return actorType === "ai_agent" ? (
@@ -128,7 +130,12 @@ export function CommentSection({
   return (
     <section className="mb-10">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-slate-800">Discussion</h2>
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <h2 className="text-lg font-semibold text-slate-800">Discussion / Comments</h2>
+          <span className="text-sm font-medium text-slate-500">
+            {comments.length} {comments.length === 1 ? "comment" : "comments"}
+          </span>
+        </div>
         <p className="mt-1 text-sm text-slate-500">
           Human comments are shown in blue. Future AI Agent comments are clearly labeled in purple.
         </p>
@@ -159,7 +166,7 @@ export function CommentSection({
             disabled={isSubmitting || isLoadingProfile}
             className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isSubmitting ? "Submitting..." : "Submit Comment"}
+            {isSubmitting ? "Posting..." : "Submit Comment"}
           </button>
         </div>
 
@@ -183,21 +190,68 @@ export function CommentSection({
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {comments.map((comment) => (
-            <article key={comment.id} className="rounded-xl border bg-white p-4 shadow-sm">
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <span className="text-sm font-semibold text-slate-800">
-                  {comment.author_display_name}
-                </span>
-                {actorBadge(comment.actor_type)}
-                <span className="text-xs text-slate-400">{comment.created_at}</span>
+        <div className="space-y-6">
+          <div>
+            <div className="mb-3 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-800">Human Comments</h3>
+              <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+                {humanComments.length}
+              </span>
+            </div>
+            {humanComments.length > 0 ? (
+              <div className="space-y-3">
+                {humanComments.map((comment) => (
+                  <article key={comment.id} className="rounded-xl border bg-white p-4 shadow-sm">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-semibold text-slate-800">
+                        {comment.author_display_name}
+                      </span>
+                      {actorBadge(comment.actor_type)}
+                      <span className="text-xs text-slate-400">{comment.created_at}</span>
+                    </div>
+                    <p className="whitespace-pre-wrap text-sm leading-6 text-slate-600">
+                      {comment.body}
+                    </p>
+                  </article>
+                ))}
               </div>
-              <p className="whitespace-pre-wrap text-sm leading-6 text-slate-600">
-                {comment.body}
-              </p>
-            </article>
-          ))}
+            ) : (
+              <div className="rounded-xl border bg-white px-5 py-6 text-sm text-slate-400">
+                No human comments yet.
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="mb-3 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-800">AI Agent Comments</h3>
+              <span className="rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
+                {aiAgentComments.length}
+              </span>
+            </div>
+            {aiAgentComments.length > 0 ? (
+              <div className="space-y-3">
+                {aiAgentComments.map((comment) => (
+                  <article key={comment.id} className="rounded-xl border bg-white p-4 shadow-sm">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-semibold text-slate-800">
+                        {comment.author_display_name}
+                      </span>
+                      {actorBadge(comment.actor_type)}
+                      <span className="text-xs text-slate-400">{comment.created_at}</span>
+                    </div>
+                    <p className="whitespace-pre-wrap text-sm leading-6 text-slate-600">
+                      {comment.body}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border bg-white px-5 py-6 text-sm text-slate-400">
+                No AI Agent comments yet.
+              </div>
+            )}
+          </div>
         </div>
       )}
     </section>
