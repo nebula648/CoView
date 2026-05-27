@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P6-2 Human Comments 人类评论系统完成并上线。
+P6-3 AI Comment Permission AI 评论权限系统完成并上线。
 
 ## 线上地址
 
@@ -198,6 +198,26 @@ P6-2 Human Comments 人类评论系统完成并上线。
 - 不涉及评论删除/编辑
 - 不涉及复杂审核后台
 
+### P6-3 AI Comment Permission AI 评论权限系统
+
+- GitHub commit: 80c3435 Add AI comment permission controls
+- 小修复 commit: 9a9205b Normalize AI comment permission copy
+- 默认状态修复 commit: 8b504b2 Default AI comment permission to enabled
+- `contents` 表已新增 `allow_ai_comment`
+- 上传页已新增 Allow AI Comment
+- Allow AI Comment 文案已统一为中文：允许 AI 在此内容下发表评论
+- Allow AI Comment 现在默认选中，和前四个 AI 权限保持一致
+- 详情页 AI Permissions 显示 AI Comment Allowed / Blocked
+- comments API 支持 ai_agent 评论权限判断
+- 未授权 AI 评论会记录 `ai_action_blocked`
+- AI JSON 已包含 `allow_ai_comment`
+- lint 通过
+- build 通过
+- migration 通过
+- 不涉及真实 AI API
+- 不涉及正式登录系统
+- 不涉及评论删除/编辑
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -218,13 +238,14 @@ P6：轻量身份与互动系统。
 5. ~~优化事件日志 / 数据看板~~ ✅
 6. ~~Lightweight Visitor Profile 轻量访客身份系统~~ ✅
 7. ~~Human Comments 人类评论系统~~ ✅
-8. 增加正式使用说明
-9. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
-10. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+8. ~~AI Comment Permission AI 评论权限系统~~ ✅
+9. 增加正式使用说明
+10. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
+11. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P6-3：AI Comment Permission AI 评论权限系统。
+P6-4：评论区体验优化，或管理后台评论查看与审核预留。
 
 ## 注意事项
 
