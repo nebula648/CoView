@@ -3,13 +3,11 @@
  * Run with: npx tsx db/check.ts
  */
 import { Pool } from "pg";
-import { getDatabaseUrl, logDatabaseError } from "./utils";
-
-const DATABASE_URL = getDatabaseUrl();
+import { getPgPoolConfig, logDatabaseError } from "./utils";
 
 async function main() {
   console.log("Checking PostgreSQL connection...");
-  const pool = new Pool({ connectionString: DATABASE_URL, max: 1 });
+  const pool = new Pool(getPgPoolConfig());
 
   try {
     const result = await pool.query<{

@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { inspect } from "util";
+import type { PoolConfig } from "pg";
 
 const DEFAULT_DATABASE_URL =
   "postgresql://postgres:postgres@localhost:5432/coview";
@@ -35,6 +36,46 @@ export function loadEnvLocal(): void {
 export function getDatabaseUrl(): string {
   loadEnvLocal();
   return process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL;
+}
+
+export function getSslConfigForDatabaseUrl(databaseUrl: string): PoolConfig["ssl"] {
+  const lowerUrl = databaseUrl.toLowerCase();
+  const isLocalDatabase =
+    lowerUrl.includes("@localhost:") ||
+    lowerUrl.includes("@127.0.0.1:") ||
+    lowerUrl.includes("@[::1]:");
+  const requiresSsl =
+    lowerUrl.includes("sslmode=require") ||
+    lowerUrl.includes("supabase.com") ||
+    lowerUrl.includes("pooler.supabase.com");
+
+  if (isLocalDatabase || !requiresSsl) {
+    return undefined;
+  }
+
+  return { rejectUnauthorized: false };
+}
+
+export function getPgPoolConfig(
+  databaseUrl = getDatabaseUrl(),
+  max = 1,
+): PoolConfig {
+  const ssl = getSslConfigForDatabaseUrl(databaseUrl);
+  return {
+    connectionString: ssl ? removeSslMode(databaseUrl) : databaseUrl,
+    max,
+    ssl,
+  };
+}
+
+function removeSslMode(databaseUrl: string): string {
+  try {
+    const url = new URL(databaseUrl);
+    url.searchParams.delete("sslmode");
+    return url.toString();
+  } catch {
+    return databaseUrl;
+  }
 }
 
 export function logDatabaseError(label: string, err: unknown): void {

@@ -1,6 +1,7 @@
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "@/db/schema";
+import { getPgPoolConfig } from "@/db/utils";
 
 let dbInstance: NodePgDatabase<typeof schema> | null = null;
 let initError: string | null = null;
@@ -16,7 +17,7 @@ export function getDB(): NodePgDatabase<typeof schema> | null {
   }
 
   try {
-    const pool = new Pool({ connectionString: url, max: 5 });
+    const pool = new Pool(getPgPoolConfig(url, 5));
     dbInstance = drizzle(pool, { schema });
     return dbInstance;
   } catch (e: any) {

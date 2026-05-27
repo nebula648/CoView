@@ -8,12 +8,12 @@ import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "./schema";
 import { eq } from "drizzle-orm";
+import { createHash } from "crypto";
 import * as fs from "fs";
 import * as path from "path";
-import { getDatabaseUrl, logDatabaseError } from "./utils";
+import { getPgPoolConfig, logDatabaseError } from "./utils";
 
 const DATA_DIR = path.resolve(process.cwd(), "..", "data");
-const DATABASE_URL = getDatabaseUrl();
 const REQUIRED_TABLES = ["contents", "content_metrics", "events", "ai_decisions"];
 
 function readJSON(filename: string): any[] {
@@ -30,24 +30,47 @@ function parseTime(str: string): Date {
   return isNaN(d.getTime()) ? new Date() : d;
 }
 
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  );
+}
+
+function stableUuidFromLegacyId(id: string): string {
+  if (isUuid(id)) return id;
+
+  const hash = createHash("sha256").update(`coview:${id}`).digest("hex");
+  return [
+    hash.slice(0, 8),
+    hash.slice(8, 12),
+    `5${hash.slice(13, 16)}`,
+    `${((parseInt(hash.slice(16, 18), 16) & 0x3f) | 0x80).toString(16)}${hash.slice(18, 20)}`,
+    hash.slice(20, 32),
+  ].join("-");
+}
+
 async function main() {
   const contents = readJSON("contents.json");
   const events = readJSON("events.json");
 
   console.log(`Found ${contents.length} contents, ${events.length} events`);
 
-  const pool = new Pool({ connectionString: DATABASE_URL, max: 1 });
+  const pool = new Pool(getPgPoolConfig());
   const db = drizzle(pool, { schema });
 
   try {
     await assertMigrationComplete(pool);
 
     // --- Insert contents ---
+    const contentIdMap = new Map<string, string>();
     for (const c of contents) {
+      const dbContentId = stableUuidFromLegacyId(c.id);
+      contentIdMap.set(c.id, dbContentId);
+
       const existing = await db
         .select()
         .from(schema.contents)
-        .where(eq(schema.contents.id, c.id))
+        .where(eq(schema.contents.slug, c.id))
         .limit(1);
 
       if (existing.length > 0) {
@@ -56,7 +79,7 @@ async function main() {
       }
 
       await db.insert(schema.contents).values({
-        id: c.id,
+        id: dbContentId,
         slug: c.id,
         title: c.title,
         body: c.body,
@@ -79,7 +102,7 @@ async function main() {
       await db
         .insert(schema.contentMetrics)
         .values({
-          contentId: c.id,
+          contentId: dbContentId,
           humanViews: m.human_views ?? 0,
           humanLikes: m.human_likes ?? 0,
           humanSaves: m.human_saves ?? 0,
@@ -94,7 +117,7 @@ async function main() {
       const d = c.ai_decision;
       if (d && Object.keys(d).length > 0) {
         await db.insert(schema.aiDecisions).values({
-          contentId: c.id,
+          contentId: dbContentId,
           shouldRead: d.should_read ?? true,
           shouldSave: d.should_save ?? false,
           shouldCite: d.should_cite ?? false,
@@ -131,7 +154,7 @@ async function main() {
 
       await db.insert(schema.events).values({
         id: e.event_id,
-        contentId: e.content_id ?? null,
+        contentId: e.content_id ? contentIdMap.get(e.content_id) ?? null : null,
         eventType,
         actorType,
         userAgentHash: e.user_agent_hash ?? null,

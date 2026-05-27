@@ -5,9 +5,7 @@
  * Creates all tables if they don't exist, using raw SQL via pg Pool.
  */
 import { Pool } from "pg";
-import { getDatabaseUrl, logDatabaseError } from "./utils";
-
-const DATABASE_URL = getDatabaseUrl();
+import { getPgPoolConfig, logDatabaseError } from "./utils";
 
 const SQL = `
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -83,7 +81,7 @@ CREATE TABLE IF NOT EXISTS ai_decisions (
 
 async function main() {
   console.log("Connecting to PostgreSQL...");
-  const pool = new Pool({ connectionString: DATABASE_URL, max: 1 });
+  const pool = new Pool(getPgPoolConfig());
 
   try {
     await pool.query("SELECT 1");
