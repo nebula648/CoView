@@ -70,15 +70,16 @@ export async function revokeAgentTokenAction(formData: FormData) {
     redirect("/admin/agent-tokens?type=error&message=Missing%20token%20id.");
   }
 
+  let redirectUrl =
+    "/admin/agent-tokens?type=success&message=Agent%20token%20revoked.";
+
   try {
     await revokeAgentAccessToken(tokenId);
     revalidatePath("/admin/agent-tokens");
-    redirect(
-      "/admin/agent-tokens?type=success&message=Agent%20token%20revoked.",
-    );
   } catch {
-    redirect(
-      "/admin/agent-tokens?type=error&message=Failed%20to%20revoke%20Agent%20token.",
-    );
+    redirectUrl =
+      "/admin/agent-tokens?type=error&message=Failed%20to%20revoke%20Agent%20token.";
   }
+
+  redirect(redirectUrl);
 }
