@@ -5,7 +5,7 @@ import type { Agent } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 function formatAgentTime(raw: string | null): string {
-  if (!raw) return "—";
+  if (!raw) return "-";
   try {
     const date = new Date(raw);
     if (isNaN(date.getTime())) return raw;
@@ -56,9 +56,17 @@ export default async function AdminAgentsPage() {
           <h1 className="text-2xl font-bold text-slate-800">
             Agents / AI Agent 管理
           </h1>
+          <p className="mt-1 text-sm font-semibold text-slate-600">
+            外部 AI Agent 身份管理
+          </p>
           <p className="mt-1 max-w-2xl text-sm text-slate-500">
-            Review registered external AI Agent identities. This is a registry
-            only; external write APIs are not enabled yet.
+            Review registered external AI Agent identities. This registry
+            defines who an external Agent is before any tokens or write APIs are
+            enabled.
+          </p>
+          <p className="mt-1 max-w-2xl text-sm text-slate-500">
+            查看已注册的外部 AI Agent 身份。本注册表用于定义外部 Agent
+            的平台身份；当前阶段尚未启用 token 或外部写入 API。
           </p>
         </div>
         <span className="text-xs text-slate-400">
@@ -67,20 +75,28 @@ export default async function AdminAgentsPage() {
       </div>
 
       <section className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard label="Total Agents" value={stats.totalAgents} />
-        <StatCard label="Active Agents" value={stats.activeAgents} />
-        <StatCard label="Pending Agents" value={stats.pendingAgents} />
-        <StatCard label="Suspended Agents" value={stats.suspendedAgents} />
+        <StatCard label="Total Agents / Agent 总数" value={stats.totalAgents} />
+        <StatCard label="Active Agents / 活跃 Agent" value={stats.activeAgents} />
+        <StatCard label="Pending Agents / 待审核 Agent" value={stats.pendingAgents} />
+        <StatCard
+          label="Suspended Agents / 已暂停 Agent"
+          value={stats.suspendedAgents}
+        />
       </section>
 
       <section className="mb-6 rounded-xl border border-purple-200 bg-purple-50 p-5">
         <h2 className="text-sm font-semibold text-purple-900">
-          Registry-only phase
+          Registry-only Phase / 仅注册阶段
         </h2>
         <p className="mt-2 text-sm leading-6 text-purple-800">
           P9-1 creates platform identities for future external AI Agent
           participation. No agent tokens, external write APIs, public agent
           profiles, or real AI APIs are enabled in this phase.
+        </p>
+        <p className="mt-2 text-sm leading-6 text-purple-800">
+          P9-1 只为未来的外部 AI Agent 参与建立平台身份。目前不会生成
+          Agent token，不开放外部写入 API，不提供公开 Agent 主页，也不接入真实
+          AI API。
         </p>
       </section>
 
@@ -95,28 +111,28 @@ export default async function AdminAgentsPage() {
               <thead>
                 <tr className="border-b bg-slate-50 text-left">
                   <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Agent
+                    AGENT / Agent
                   </th>
                   <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Owner
+                    OWNER / 所属方
                   </th>
                   <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Type
+                    TYPE / 类型
                   </th>
                   <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Status
+                    STATUS / 状态
                   </th>
                   <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Scopes
+                    SCOPES / 权限范围
                   </th>
                   <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Created
+                    CREATED / 创建时间
                   </th>
                   <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Last Seen
+                    LAST SEEN / 最近活跃
                   </th>
                   <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Homepage
+                    HOMEPAGE / 主页
                   </th>
                 </tr>
               </thead>
@@ -169,7 +185,7 @@ export default async function AdminAgentsPage() {
                           Open
                         </Link>
                       ) : (
-                        <span className="text-xs text-slate-400">—</span>
+                        <span className="text-xs text-slate-400">-</span>
                       )}
                     </td>
                   </tr>
