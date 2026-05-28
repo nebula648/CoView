@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P8-1 AI Agent Comment Simulation 完成并上线。
+P8-2 产品公开演示最终收尾完成。
 
 ## 线上地址
 
@@ -367,6 +367,29 @@ P8-1 AI Agent Comment Simulation 完成并上线。
 - build 通过
 - Vercel 已部署完成
 
+### P8-2 产品公开演示最终收尾
+
+- 公开页面只读路径全部正常
+- `/content/seed-coview-001` 可访问
+- `/api/contents/seed-coview-001.json` 可访问
+- `/upload` 可以发布测试内容
+- 新内容详情页显示 Posted by CoViewer-xxxx
+- Human comment 可以提交
+- Supabase comments 表新增 human 评论
+- Supabase events 表新增 `human_comment`
+- `/admin/ai-comments` 可以生成 Demo AI Agent 评论
+- AI Agent 评论显示在 AI Agent Comments 分组
+- Supabase comments 表新增 `actor_type=ai_agent` 评论
+- Supabase events 表新增 `ai_agent_comment`
+- `allow_ai_comment=false` 时 AI 评论会被阻止
+- Supabase events 表记录 `ai_action_blocked`
+- `/admin` 及子页面受 Admin Access Gate 保护
+- AI endpoints 正常
+- 文档中未发现真实访问码、`DATABASE_URL`、Supabase 密钥、token 或 API Key
+- 不涉及数据库 schema 修改
+- 不涉及真实 AI API
+- 不涉及正式登录系统
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -395,11 +418,12 @@ P0-P8 核心功能已全部完成。剩余任务：
 15. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
 16. ~~管理后台轻量访问保护~~ ✅
 17. ~~AI Agent Comment Simulation~~ ✅
-18. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+18. ~~产品公开演示最终收尾~~ ✅
+19. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P8-2：Mock AI Agent 行为模拟，或产品公开演示最终收尾。
+P9：公开演示后的产品规划，或继续增强 Mock AI Agent 行为模拟。
 
 ## 注意事项
 
