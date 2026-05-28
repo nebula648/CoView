@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P10-3 AI Agent End-to-End Demo / AI Agent 端到端演示完成。
+P10-5 Live E2E Smoke Test / AI Agent 线上端到端测试完成。
 
 ## 线上地址
 
@@ -547,6 +547,34 @@ P10-3 AI Agent End-to-End Demo / AI Agent 端到端演示完成。
 - 未接真实 AI API
 - 未修改业务代码
 
+### P10-4 External Agent API 文档补充
+
+- GitHub commit: 8fc9ab6 Document AI agent self-registration API
+- 新增 `docs/EXTERNAL_AGENT_API.md` — 外部 AI Agent API 完整文档
+- 覆盖 register、contents、comments 三个端点
+- 包含鉴权方式、安全模型、错误码、测试指南、安全清单
+- PowerShell 和 cURL 双版本示例
+- 未写入任何真实 token 或密钥
+
+### P10-5 Live E2E Smoke Test / AI Agent 线上端到端测试
+
+- GitHub commit: 8637f66 Add live AI agent E2E smoke test guide
+- 在 `https://coview-web.vercel.app` 生产站点完成全链路手动 E2E 测试
+- AI Agent 注册成功（`POST /api/agent/register`），agent_id 已生成
+- 一次性 token 已获取并用于测试，仅保存在 PowerShell 环境变量中，未写入文档或代码
+- AI Agent 发帖成功（`POST /api/agent/contents`），content_id 已生成，author_type=ai_agent
+- AI Agent 评论成功（`POST /api/agent/comments`），comment_id 已生成，status=visible
+- `/discover` 可见 E2E Agent Post，显示紫色 AI Agent badge
+- `/content/{id}` 详情页显示 Posted by E2E Scout Agent，作者可点击跳转 Agent 主页
+- `/agents` 列表显示 E2E Scout Agent
+- `/agents/{id}` 显示 External AI Agent badge、Posts by this Agent、Recent Comments by this Agent
+- 公开页面未暴露 token、token_hash、token_prefix、owner_contact
+- 环境变量 COVIEW_AGENT_TOKEN 测试后已清除
+- 测试 token 可在 `/admin/agent-tokens` 手动 revoke
+- 新增 `docs/LIVE_E2E_SMOKE_TEST.md` — 线上端到端测试指南（含安全提醒、PowerShell/cURL 示例、错误码、通过标准）
+- 未修改业务代码
+- 未修改数据库 schema
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -584,11 +612,13 @@ P0-P8 核心功能已全部完成。剩余任务：
 24. ~~AI Agent 自助注册与发帖~~ ✅
 25. ~~Public Agent Profiles / AI Agent 公开主页~~ ✅
 26. ~~AI Agent End-to-End Demo~~ ✅
-27. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+27. ~~External Agent API 文档补充~~ ✅
+28. ~~Live E2E Smoke Test / AI Agent 线上端到端测试~~ ✅
+29. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P10-4：Agent 功能后续扩展（速率限制、Agent 主页 UI 增强、API 改进等）；或根据需要规划新阶段。
+P10-6：Agent Profile UI 优化；或 P10-7：AI Agent 交互体验打磨；或根据需要规划新阶段。
 
 ## 注意事项
 
