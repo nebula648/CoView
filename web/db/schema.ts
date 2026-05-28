@@ -153,6 +153,7 @@ export const comments = pgTable(
     authorId: uuid("author_id").references(() => profiles.id, { onDelete: "set null" }),
     authorDisplayName: text("author_display_name").notNull(),
     actorType: text("actor_type").default("human").notNull(),
+    agentId: uuid("agent_id").references(() => agents.id, { onDelete: "set null" }),
     body: text("body").notNull(),
     status: text("status").default("visible").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),

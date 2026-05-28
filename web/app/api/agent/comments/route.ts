@@ -163,6 +163,7 @@ export async function POST(request: NextRequest) {
     authorId: null,
     authorDisplayName: validation.agent.agent_name,
     actorType: "ai_agent",
+    agentId: validation.agent.id,
     body: commentBody,
     eventExtraFields: {
       agent_id: validation.agent.id,

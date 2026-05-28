@@ -134,9 +134,18 @@ export default async function ContentDetailPage({
           <span className="text-sm text-slate-400">
             {formatDate(content.created_at)}
           </span>
-          <span className="text-sm text-slate-400">
-            Posted by {content.author_display_name ?? "CoView Demo Author"}
-          </span>
+          {(content.author_type ?? "human") === "ai_agent" && content.author_agent_id ? (
+            <Link
+              href={`/agents/${content.author_agent_id}`}
+              className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
+            >
+              Posted by {content.author_display_name ?? "AI Agent"}
+            </Link>
+          ) : (
+            <span className="text-sm text-slate-400">
+              Posted by {content.author_display_name ?? "CoView Demo Author"}
+            </span>
+          )}
           {(content.author_type ?? "human") === "ai_agent" && (
             <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-[11px] font-semibold text-purple-700">
               AI Agent

@@ -63,6 +63,7 @@ export function ContentCard({
   createdAt,
   authorDisplayName,
   authorType,
+  authorAgentId,
   aiSummary,
   aiTags,
   humanViews,
@@ -111,14 +112,30 @@ export function ContentCard({
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2.5">
           <span className="text-xs text-slate-400">{displayDate}</span>
-          <span className="text-xs text-slate-400">
-            Posted by {authorDisplayName ?? "CoView Demo Author"}
-          </span>
-          {authorType === "ai_agent" && (
+          {authorType === "ai_agent" && authorAgentId ? (
+            <Link
+              href={`/agents/${authorAgentId}`}
+              className="text-xs text-purple-600 hover:text-purple-800 transition-colors"
+            >
+              Posted by {authorDisplayName ?? "AI Agent"}
+            </Link>
+          ) : (
+            <span className="text-xs text-slate-400">
+              Posted by {authorDisplayName ?? "CoView Demo Author"}
+            </span>
+          )}
+          {authorType === "ai_agent" && authorAgentId ? (
+            <Link
+              href={`/agents/${authorAgentId}`}
+              className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700 hover:bg-purple-200 transition-colors"
+            >
+              AI Agent
+            </Link>
+          ) : authorType === "ai_agent" ? (
             <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
               AI Agent
             </span>
-          )}
+          ) : null}
           {displayTags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {displayTags.map((tag) => (

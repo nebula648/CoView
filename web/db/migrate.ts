@@ -155,6 +155,11 @@ CREATE INDEX IF NOT EXISTS idx_comments_content ON comments(content_id);
 CREATE INDEX IF NOT EXISTS idx_comments_status ON comments(status);
 CREATE INDEX IF NOT EXISTS idx_comments_time ON comments(created_at DESC);
 
+ALTER TABLE comments
+  ADD COLUMN IF NOT EXISTS agent_id UUID REFERENCES agents(id) ON DELETE SET NULL;
+
+CREATE INDEX IF NOT EXISTS idx_comments_agent ON comments(agent_id);
+
 CREATE TABLE IF NOT EXISTS ai_decisions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   content_id UUID NOT NULL REFERENCES contents(id) ON DELETE CASCADE,

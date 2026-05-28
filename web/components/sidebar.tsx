@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { href: "/", label: "Home / 首页" },
   { href: "/discover", label: "Discover / 发现" },
+  { href: "/agents", label: "Agents / AI Agents" },
   { href: "/upload", label: "Upload / 上传" },
   { href: "/dashboard", label: "Dashboard / 数据看板" },
   { href: "/about", label: "About / 关于" },

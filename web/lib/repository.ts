@@ -268,6 +268,108 @@ export async function createAgent(input: {
   return { agent, token };
 }
 
+export async function getPublicAgents(): Promise<Agent[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.agents)
+        .where(eq(schema.agents.status, "active"))
+        .orderBy(desc(schema.agents.createdAt));
+      return rows.map(mapDBAgent);
+    },
+    () => readAgents().filter((a: any) => a.status === "active").map(ensureAgentShape),
+  );
+}
+
+export async function getAgentById(id: string): Promise<Agent | null> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.agents)
+        .where(eq(schema.agents.id, id))
+        .limit(1);
+      return rows.length > 0 ? mapDBAgent(rows[0]) : null;
+    },
+    () => {
+      const agents = readAgents();
+      const agent = agents.find((a: any) => a.id === id);
+      return agent ? ensureAgentShape(agent) : null;
+    },
+  );
+}
+
+export async function getContentsByAgent(agentId: string): Promise<any[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select({
+          content: schema.contents,
+          metrics: schema.contentMetrics,
+        })
+        .from(schema.contents)
+        .leftJoin(
+          schema.contentMetrics,
+          eq(schema.contentMetrics.contentId, schema.contents.id),
+        )
+        .where(
+          and(
+            eq(schema.contents.authorType, "ai_agent"),
+            eq(schema.contents.authorAgentId, agentId),
+          ),
+        )
+        .orderBy(desc(schema.contents.createdAt));
+      return rows.map((row: any) => attachMetrics(mapDBContent(row.content), row.metrics));
+    },
+    () => {
+      const contents = readContents();
+      return contents
+        .filter((c: any) => c.author_type === "ai_agent" && c.author_agent_id === agentId)
+        .map(ensureLegacyShape);
+    },
+  );
+}
+
+export async function getCommentsByAgent(agentId: string, limit: number = 50): Promise<any[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.comments)
+        .where(eq(schema.comments.agentId, agentId))
+        .orderBy(desc(schema.comments.createdAt))
+        .limit(limit);
+      return rows.map(mapDBComment);
+    },
+    () => {
+      const comments = readComments();
+      return comments
+        .filter((c: any) => c.agent_id === agentId)
+        .map(ensureCommentShape)
+        .sort(
+          (a: any, b: any) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        )
+        .slice(0, limit);
+    },
+  );
+}
+
+export async function getAgentProfileStats(agentId: string): Promise<{
+  postsCount: number;
+  commentsCount: number;
+}> {
+  const [contents, comments] = await Promise.all([
+    getContentsByAgent(agentId),
+    getCommentsByAgent(agentId),
+  ]);
+  return {
+    postsCount: contents.length,
+    commentsCount: comments.length,
+  };
+}
+
 /* ------------------------------------------------------------------ */
 /*  Lightweight Profiles                                                */
 /* ------------------------------------------------------------------ */
@@ -771,6 +873,7 @@ export async function createComment(payload: {
   authorDisplayName: string;
   body: string;
   actorType?: "human" | "ai_agent";
+  agentId?: string | null;
   eventExtraFields?: Record<string, unknown>;
 }): Promise<any> {
   const commentBody = payload.body.trim();
@@ -787,6 +890,7 @@ export async function createComment(payload: {
           authorId: payload.authorId ?? null,
           authorDisplayName,
           actorType,
+          agentId: payload.agentId ?? null,
           body: commentBody,
           status: "visible",
         })
@@ -1389,6 +1493,7 @@ function mapDBComment(row: any): any {
     author_id: row.authorId ?? null,
     author_display_name: row.authorDisplayName,
     actor_type: row.actorType === "ai_agent" ? "ai_agent" : "human",
+    agent_id: row.agentId ?? null,
     body: row.body,
     status: normalizeCommentStatus(row.status),
     created_at: row.createdAt
@@ -1404,6 +1509,7 @@ function ensureCommentShape(comment: any): any {
     author_id: comment.author_id ?? null,
     author_display_name: comment.author_display_name ?? DEFAULT_AUTHOR_NAME,
     actor_type: comment.actor_type === "ai_agent" ? "ai_agent" : "human",
+    agent_id: comment.agent_id ?? null,
     body: comment.body ?? "",
     status: normalizeCommentStatus(comment.status),
     created_at:
