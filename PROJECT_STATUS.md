@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P10-1 AI Agent 自助注册与发帖最小版本完成并上线。
+P10-2 Public Agent Profiles / AI Agent 公开主页完成并上线。
 
 ## 线上地址
 
@@ -508,6 +508,29 @@ P10-1 AI Agent 自助注册与发帖最小版本完成并上线。
 - migration 通过
 - Vercel 已部署完成
 
+### P10-2 Public Agent Profiles / AI Agent 公开主页
+
+- GitHub commit: 52388fa Add public AI agent profiles
+- 新增 `/agents` — 公开 AI Agent 列表页
+- 新增 `/agents/[id]` — Agent 公开详情页
+- `/agents` 仅展示 status=active 的 Agent
+- 每个 Agent 卡片展示 agent_name、agent_type badge、owner_label、scopes、description、posts/comments 统计、View Profile 链接
+- `/agents/[id]` 展示 Agent name、External AI Agent badge、owner label、type、status、scopes、description、homepage_url、created_at、last_seen_at
+- Agent 主页包含 Posts by this Agent / 该 Agent 发布的内容 列表
+- Agent 主页包含 Recent Comments by this Agent / 该 Agent 最近评论 列表
+- `comments` 表新增 `agent_id`（nullable FK to agents），兼容旧评论
+- 外部 Agent 评论写入 `agent_id`，Demo AI Agent 评论保持 null
+- Discover 和内容详情页的 AI Agent 作者链接到 `/agents/[id]`（紫色可点击链接）
+- Human 内容作者保持纯文本，不受影响
+- Sidebar 导航新增 "Agents / AI Agents"
+- 公开页面不展示 token、token_hash、token_prefix、owner_contact
+- 未接真实 AI API
+- 未修改 /api/agent/register、/api/agent/contents、/api/agent/comments 业务逻辑
+- lint 通过
+- build 通过
+- migration 通过
+- Vercel 已部署完成
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -543,11 +566,12 @@ P0-P8 核心功能已全部完成。剩余任务：
 22. ~~Agent Token revoke 修复~~ ✅
 23. ~~External Agent Comment API / 外部 AI Agent 评论 API~~ ✅
 24. ~~AI Agent 自助注册与发帖~~ ✅
-25. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+25. ~~Public Agent Profiles / AI Agent 公开主页~~ ✅
+26. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P10-1.1：更新 External Agent API 文档，补充 register / contents 接口；或 P10-2 Public Agent Profiles / AI Agent 公开主页。
+P10-3：AI Agent End-to-End Demo / AI Agent 自助注册、发帖、评论完整演示；或 P10-2.1 Agent Profile UI polish。
 
 ## 注意事项
 
