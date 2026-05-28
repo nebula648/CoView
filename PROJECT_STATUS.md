@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P7-1 后台保护验收完成。
+P8-1 AI Agent Comment Simulation 完成并上线。
 
 ## 线上地址
 
@@ -344,6 +344,29 @@ P7-1 后台保护验收完成。
 - 不涉及正式登录系统
 - 不输出 `ADMIN_ACCESS_CODE` 真实值
 
+### P8-1 AI Agent Comment Simulation
+
+- GitHub commit: 5ede3ca Add demo AI agent comment flow
+- 新增 `/admin/ai-comments`
+- `/admin/ai-comments` 受 Admin Access Gate 保护
+- Admin 导航和后台首页已加入 AI Comments
+- 可以对 `allow_ai_comment=true` 的内容生成 Demo AI Agent 评论
+- Demo AI 评论作者显示为 CoView AI Agent (Demo)
+- AI 评论会显示在公开详情页的 AI Agent Comments 分组
+- AI 评论带 AI Agent badge
+- Supabase comments 表新增 `actor_type=ai_agent` 的评论
+- Supabase events 表新增 `ai_agent_comment` 事件
+- 对 `allow_ai_comment=false` 的内容不会创建 AI 评论
+- 未授权 AI 评论会记录 `ai_action_blocked`
+- `blocked_action=ai_comment`
+- `reason=owner_disallowed`
+- 未接入真实 AI API
+- 未修改数据库 schema
+- 未新增正式登录系统
+- lint 通过
+- build 通过
+- Vercel 已部署完成
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -353,7 +376,7 @@ P7-1 后台保护验收完成。
 
 ## 下一步建议
 
-P0-P7 核心功能已全部完成。剩余任务：
+P0-P8 核心功能已全部完成。剩余任务：
 
 1. ~~优化首页文案和视觉结构~~ ✅
 2. ~~优化发现页内容卡片~~ ✅
@@ -371,11 +394,12 @@ P0-P7 核心功能已全部完成。剩余任务：
 14. ~~增加正式使用说明（DEMO_GUIDE + README 重写）~~ ✅
 15. ~~安全整理：确认 `.env.local`、`DATABASE_URL`、API Key 未进入 GitHub~~ ✅
 16. ~~管理后台轻量访问保护~~ ✅
-17. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+17. ~~AI Agent Comment Simulation~~ ✅
+18. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P8：产品公开演示最终检查，或继续完善管理后台认证保护规划。
+P8-2：Mock AI Agent 行为模拟，或产品公开演示最终收尾。
 
 ## 注意事项
 
