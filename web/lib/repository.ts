@@ -226,6 +226,48 @@ export async function validateAgentToken(
   };
 }
 
+export async function createAgent(input: {
+  agentName: string;
+  agentType: string;
+  description?: string | null;
+  homepageUrl?: string | null;
+}): Promise<{ agent: Agent; token: string }> {
+  const db = getDB();
+  if (!db) {
+    throw new Error("Agent registration requires database mode.");
+  }
+
+  const agentRows = await db
+    .insert(schema.agents)
+    .values({
+      agentName: input.agentName.trim(),
+      agentOwnerLabel: "self-registered",
+      agentOwnerContact: null,
+      agentType: input.agentType.trim() || "assistant",
+      status: "active",
+      scopes: ["read", "comment", "cite", "recommend", "post"],
+      description: input.description?.trim() || null,
+      homepageUrl: input.homepageUrl?.trim() || null,
+    })
+    .returning();
+
+  const agent = mapDBAgent(agentRows[0]);
+  const token = generateAgentToken();
+  const tokenHash = hashAgentToken(token);
+  const tokenPrefix = `${token.slice(0, 18)}...`;
+
+  await db.insert(schema.agentAccessTokens).values({
+    agentId: agent.id,
+    tokenHash,
+    tokenPrefix,
+    name: "default",
+    scopes: ["read", "comment", "cite", "recommend", "post"],
+    status: "active",
+  });
+
+  return { agent, token };
+}
+
 /* ------------------------------------------------------------------ */
 /*  Lightweight Profiles                                                */
 /* ------------------------------------------------------------------ */
@@ -378,6 +420,8 @@ export async function createContent(payload: {
   tags: string[];
   authorId?: string | null;
   authorDisplayName?: string | null;
+  authorType?: string;
+  authorAgentId?: string | null;
   allowAiView: boolean;
   allowAiSave: boolean;
   allowAiCite: boolean;
@@ -397,6 +441,8 @@ export async function createContent(payload: {
         tags: payload.tags,
         authorId: payload.authorId ?? null,
         authorDisplayName: payload.authorDisplayName ?? DEFAULT_AUTHOR_NAME,
+        authorType: payload.authorType ?? "human",
+        authorAgentId: payload.authorAgentId ?? null,
         allowAiView: payload.allowAiView,
         allowAiSave: payload.allowAiSave,
         allowAiCite: payload.allowAiCite,
@@ -416,6 +462,8 @@ export async function createContent(payload: {
     tags: payload.tags,
     author_id: payload.authorId ?? null,
     author_display_name: payload.authorDisplayName ?? DEFAULT_AUTHOR_NAME,
+    author_type: payload.authorType ?? "human",
+    author_agent_id: payload.authorAgentId ?? null,
     created_at: new Date().toISOString().replace("T", " ").substring(0, 19),
     metrics: { human_views: 0, human_likes: 0, human_saves: 0, ai_views: 0, ai_saves: 0, ai_citations: 0 },
     ai_summary: "尚未生成 AI Summary。",
@@ -1168,6 +1216,8 @@ function mapDBContent(row: any): any {
     tags: row.tags ?? [],
     author_id: row.authorId ?? null,
     author_display_name: row.authorDisplayName ?? DEFAULT_AUTHOR_NAME,
+    author_type: row.authorType ?? row.author_type ?? "human",
+    author_agent_id: row.authorAgentId ?? row.author_agent_id ?? null,
     created_at: row.createdAt
       ? new Date(row.createdAt).toISOString().replace("T", " ").substring(0, 19)
       : "",
@@ -1224,6 +1274,8 @@ function ensureLegacyShape(c: any): any {
     tags: c.tags ?? [],
     author_id: c.author_id ?? null,
     author_display_name: c.author_display_name ?? DEFAULT_AUTHOR_NAME,
+    author_type: c.author_type ?? "human",
+    author_agent_id: c.author_agent_id ?? null,
     metrics: c.metrics ?? { human_views: 0, human_likes: 0, human_saves: 0, ai_views: 0, ai_saves: 0, ai_citations: 0 },
     ai_summary: c.ai_summary ?? "尚未生成 AI Summary。",
     ai_tags: c.ai_tags ?? [],

@@ -73,6 +73,8 @@ export const contents = pgTable("contents", {
   tags: text("tags").array().default([]).notNull(),
   authorId: uuid("author_id").references(() => profiles.id, { onDelete: "set null" }),
   authorDisplayName: text("author_display_name").default("CoView Demo Author").notNull(),
+  authorType: text("author_type").default("human").notNull(),
+  authorAgentId: uuid("author_agent_id").references(() => agents.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 

@@ -5,6 +5,7 @@ export type EventType =
   | "human_like"
   | "human_save"
   | "human_comment"
+  | "ai_agent_post_created"
   | "ai_agent_comment"
   | "ai_agent_view"
   | "ai_agent_save"

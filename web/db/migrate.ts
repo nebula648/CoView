@@ -95,6 +95,16 @@ UPDATE contents
 SET allow_ai_comment = false
 WHERE allow_ai_comment IS NULL;
 
+ALTER TABLE contents
+  ADD COLUMN IF NOT EXISTS author_type TEXT DEFAULT 'human' NOT NULL;
+
+ALTER TABLE contents
+  ADD COLUMN IF NOT EXISTS author_agent_id UUID REFERENCES agents(id) ON DELETE SET NULL;
+
+UPDATE contents
+SET author_type = 'human'
+WHERE author_type IS NULL OR author_type = '';
+
 CREATE TABLE IF NOT EXISTS content_metrics (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   content_id UUID UNIQUE NOT NULL REFERENCES contents(id) ON DELETE CASCADE,

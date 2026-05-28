@@ -137,6 +137,11 @@ export default async function ContentDetailPage({
           <span className="text-sm text-slate-400">
             Posted by {content.author_display_name ?? "CoView Demo Author"}
           </span>
+          {(content.author_type ?? "human") === "ai_agent" && (
+            <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-[11px] font-semibold text-purple-700">
+              AI Agent
+            </span>
+          )}
 
           {(content.tags ?? []).length > 0 && (
             <div className="flex flex-wrap gap-1">

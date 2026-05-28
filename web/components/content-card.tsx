@@ -8,8 +8,10 @@ interface ContentCardProps {
   tags: string[];
   createdAt: string;
   authorDisplayName?: string | null;
+  authorType?: string | null;
   aiSummary?: string | null;
   aiTags?: string[];
+  authorAgentId?: string | null;
   humanViews: number;
   humanLikes: number;
   humanSaves: number;
@@ -60,6 +62,7 @@ export function ContentCard({
   tags,
   createdAt,
   authorDisplayName,
+  authorType,
   aiSummary,
   aiTags,
   humanViews,
@@ -111,6 +114,11 @@ export function ContentCard({
           <span className="text-xs text-slate-400">
             Posted by {authorDisplayName ?? "CoView Demo Author"}
           </span>
+          {authorType === "ai_agent" && (
+            <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
+              AI Agent
+            </span>
+          )}
           {displayTags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {displayTags.map((tag) => (

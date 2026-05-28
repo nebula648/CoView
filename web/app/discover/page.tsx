@@ -68,6 +68,7 @@ export default async function DiscoverPage() {
                 tags={content.tags ?? []}
                 createdAt={content.created_at}
                 authorDisplayName={content.author_display_name ?? "CoView Demo Author"}
+                authorType={content.author_type ?? "human"}
                 aiSummary={content.ai_summary ?? null}
                 aiTags={content.ai_tags ?? []}
                 humanViews={m.human_views ?? 0}
