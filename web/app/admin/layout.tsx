@@ -12,6 +12,7 @@ const ADMIN_NAV = [
   { href: "/admin", label: "Console" },
   { href: "/admin/contents", label: "Contents" },
   { href: "/admin/comments", label: "Comments" },
+  { href: "/admin/ai-comments", label: "AI Comments" },
   { href: "/admin/events", label: "Events" },
 ];
 
