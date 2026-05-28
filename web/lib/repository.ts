@@ -19,6 +19,7 @@ import type {
   Agent,
   AgentAccessToken,
   AgentAccessTokenStats,
+  AgentTokenValidationResult,
   AgentStats,
   CommentStats,
 } from "@/lib/types";
@@ -155,6 +156,74 @@ export async function revokeAgentAccessToken(tokenId: string): Promise<void> {
       revokedAt: new Date(),
     })
     .where(eq(schema.agentAccessTokens.id, tokenId));
+}
+
+export async function validateAgentToken(
+  token: string,
+  requiredScope: string,
+): Promise<AgentTokenValidationResult> {
+  const normalizedToken = token.trim();
+  if (!normalizedToken) {
+    return { valid: false, reason: "missing_token" };
+  }
+
+  const db = getDB();
+  if (!db) {
+    return { valid: false, reason: "invalid_token" };
+  }
+
+  const tokenHash = hashAgentToken(normalizedToken);
+  const rows = await db
+    .select({
+      token: schema.agentAccessTokens,
+      agent: schema.agents,
+    })
+    .from(schema.agentAccessTokens)
+    .leftJoin(schema.agents, eq(schema.agentAccessTokens.agentId, schema.agents.id))
+    .where(eq(schema.agentAccessTokens.tokenHash, tokenHash))
+    .limit(1);
+
+  if (rows.length === 0) {
+    return { valid: false, reason: "invalid_token" };
+  }
+
+  const tokenRow = rows[0].token;
+  const agent = rows[0].agent ? mapDBAgent(rows[0].agent) : undefined;
+  const tokenScopes = Array.isArray(tokenRow.scopes) ? tokenRow.scopes : [];
+  const partialResult = {
+    agent,
+    token_id: tokenRow.id,
+    token_prefix: tokenRow.tokenPrefix,
+    token_scopes: tokenScopes,
+  };
+
+  if (tokenRow.status !== "active" || tokenRow.revokedAt) {
+    return { valid: false, reason: "token_revoked", ...partialResult };
+  }
+
+  if (!agent || agent.status !== "active") {
+    return { valid: false, reason: "agent_suspended", ...partialResult };
+  }
+
+  if (
+    !tokenScopes.includes(requiredScope) ||
+    !agent.scopes.includes(requiredScope)
+  ) {
+    return { valid: false, reason: "missing_scope", ...partialResult };
+  }
+
+  await db
+    .update(schema.agentAccessTokens)
+    .set({ lastUsedAt: new Date() })
+    .where(eq(schema.agentAccessTokens.id, tokenRow.id));
+
+  return {
+    valid: true,
+    agent,
+    token_id: tokenRow.id,
+    token_prefix: tokenRow.tokenPrefix,
+    token_scopes: tokenScopes,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -654,6 +723,7 @@ export async function createComment(payload: {
   authorDisplayName: string;
   body: string;
   actorType?: "human" | "ai_agent";
+  eventExtraFields?: Record<string, unknown>;
 }): Promise<any> {
   const commentBody = payload.body.trim();
   const authorDisplayName = payload.authorDisplayName.trim() || DEFAULT_AUTHOR_NAME;
@@ -683,6 +753,7 @@ export async function createComment(payload: {
           author_id: payload.authorId ?? null,
           author_display_name: authorDisplayName,
           comment_id: comment.id,
+          ...(payload.eventExtraFields ?? {}),
         },
       });
       return comment;
@@ -712,6 +783,7 @@ export async function createComment(payload: {
       author_id: payload.authorId ?? null,
       author_display_name: authorDisplayName,
       comment_id: comment.id,
+      ...(payload.eventExtraFields ?? {}),
     },
   });
 

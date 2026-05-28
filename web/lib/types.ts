@@ -62,6 +62,30 @@ export interface AgentAccessTokenStats {
   agentsWithTokens: number;
 }
 
+export type AgentTokenValidationFailureReason =
+  | "missing_token"
+  | "invalid_token"
+  | "token_revoked"
+  | "agent_suspended"
+  | "missing_scope";
+
+export type AgentTokenValidationResult =
+  | {
+      valid: true;
+      agent: Agent;
+      token_id: string;
+      token_prefix: string;
+      token_scopes: string[];
+    }
+  | {
+      valid: false;
+      reason: AgentTokenValidationFailureReason;
+      agent?: Agent;
+      token_id?: string;
+      token_prefix?: string;
+      token_scopes?: string[];
+    };
+
 export interface Comment {
   id: string;
   content_id: string;
