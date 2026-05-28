@@ -2,8 +2,7 @@
 
 ## 当前阶段
 
-P9-1 Agent Registry / 外部 AI Agent 身份注册表完成并上线。
-P9-1.1 Agents 页面 UI 文案 polish 完成并上线。
+P9-2 Agent Token / AI Agent 访问令牌完成并上线，P9-2.1 revoke 修复完成。
 
 ## 线上地址
 
@@ -427,6 +426,40 @@ P9-1.1 Agents 页面 UI 文案 polish 完成并上线。
 - lint 通过
 - build 通过
 
+### P9-2 Agent Token / AI Agent 访问令牌
+
+- GitHub commit: 860f5c9 Add agent access token management
+- 新增 `/admin/agent-tokens`
+- `/admin/agent-tokens` 可创建 Agent token
+- 完整 token 只在创建成功后一次性显示
+- 数据库只保存 `token_hash` 和 `token_prefix`
+- token 列表只显示 `token_prefix`，不显示完整 token
+- 后台可查看 token prefix、状态、scopes、created_at、last_used_at、revoked_at
+- 未开放 `/api/agent/comments`
+- 未开放 `/api/agent/posts`
+- 未接入真实 AI API
+- lint 通过
+- build 通过
+- migration 通过
+- Vercel 已部署完成
+
+### P9-2.1 Agent Token revoke 修复
+
+- GitHub commit: d4942a7 Fix agent token revoke action
+- revoke 已修复
+- revoke 会将 status 标记为 `revoked`
+- revoke 会设置 `revoked_at`
+- revoked token 不删除历史记录
+- revoked token 不再显示 Revoke 按钮
+- 修复根因：Next.js `redirect()` 被 `try/catch` 捕获导致成功 revoke 后误显示失败
+- 未开放 `/api/agent/comments`
+- 未开放 `/api/agent/posts`
+- 未接入真实 AI API
+- 未修改数据库 schema
+- lint 通过
+- build 通过
+- Vercel 已部署完成
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -458,11 +491,13 @@ P0-P8 核心功能已全部完成。剩余任务：
 18. ~~产品公开演示最终收尾~~ ✅
 19. ~~Agent Registry / 外部 AI Agent 身份注册表~~ ✅
 20. ~~Agents 页面 UI 文案 polish~~ ✅
-21. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+21. ~~Agent Token / AI Agent 访问令牌~~ ✅
+22. ~~Agent Token revoke 修复~~ ✅
+23. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P9-2：Agent Token / AI Agent 访问令牌，或先单独处理 `docs/DEMO_SCRIPT.md` 演示讲解稿。
+P9-3：External Agent Comment API / 外部 AI Agent 评论 API。
 
 ## 注意事项
 
