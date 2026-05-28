@@ -17,7 +17,7 @@ AI 注意力分开计量，让内容在人类世界和 AI 世界中的传播都�
   AI agents may view, save, cite, recommend, or comment.
 - A **Dashboard** shows both human and AI metrics side by side.
 - An **Admin Console** provides read-only visibility into content, events, and
-  comments.
+  comments, protected by a lightweight demo access gate.
 
 ## Features
 
@@ -29,7 +29,7 @@ AI 注意力分开计量，让内容在人类世界和 AI 世界中的传播都�
 | Permissions | Per-content AI View, Save, Cite, Recommend, Comment toggles |
 | Identity | Lightweight CoViewer visitor profiles (no password, no email) |
 | Comments | Human comments + AI comment permission system |
-| Admin | Read-only admin console with content, event, and comment overview |
+| Admin | Read-only admin console with content, event, and comment overview, protected by `ADMIN_ACCESS_CODE` |
 | Dashboard | Traffic overview, event type distribution, content leaderboards |
 
 ## Tech Stack
@@ -81,6 +81,7 @@ Create `web/.env.local` (never commit this file):
 ```
 DATABASE_URL=your_postgresql_connection_string
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+ADMIN_ACCESS_CODE=your_demo_admin_access_code
 ```
 
 Do not paste real credentials into source code or public documentation.
@@ -98,7 +99,8 @@ Do not paste real credentials into source code or public documentation.
 
 - Do not commit `.env.local`, `node_modules/`, `.next/`.
 - Do not expose `DATABASE_URL`, database passwords, or API keys.
-- Admin pages are public in this demo — add authentication before production use.
+- Admin pages use a lightweight `ADMIN_ACCESS_CODE` access gate. This is not a
+  formal login system; add full authentication before production use.
 - This is a research prototype. Do not publish sensitive data.
 
 ## License

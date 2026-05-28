@@ -38,6 +38,7 @@ Create `web/.env.local` (never commit):
 ```
 DATABASE_URL=your_postgresql_connection_string
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+ADMIN_ACCESS_CODE=your_demo_admin_access_code
 ```
 
 Initialize:
@@ -72,10 +73,11 @@ fallback.
 | `/upload` | Publish content with AI permission controls |
 | `/content/[slug]` | Content detail with metrics, permissions, comments, events |
 | `/dashboard` | Traffic overview, event distribution, leaderboards |
-| `/admin` | Admin console: stats and recent events |
-| `/admin/contents` | Content management list |
-| `/admin/events` | Event log with analytics |
-| `/admin/comments` | Comment overview |
+| `/admin/access` | Lightweight admin access gate |
+| `/admin` | Protected admin console: stats and recent events |
+| `/admin/contents` | Protected content management list |
+| `/admin/events` | Protected event log with analytics |
+| `/admin/comments` | Protected comment overview |
 | `/debug/ua` | UA classification debug page |
 | `/api/contents/[slug].json` | AI-readable JSON for single content |
 | `/api/ai-index.json` | Full AI-readable content index |
@@ -95,3 +97,14 @@ fallback.
 - `../docs/UI_COPY_STYLE_GUIDE.md` — bilingual copy rules
 - `../PROJECT_STATUS.md` — project phase status
 - `../DEPLOYMENT.md` — deployment guide
+
+## Admin Access Gate / 后台访问保护
+
+Admin routes under `/admin` are protected by a lightweight demo access gate.
+Set `ADMIN_ACCESS_CODE` in local and Vercel environment variables before
+visiting the admin console. The access gate stores an httpOnly cookie after a
+successful code check.
+
+This is not a formal login system. Before production use, replace it or extend
+it with full authentication, authorization, audit logging, and session
+management.

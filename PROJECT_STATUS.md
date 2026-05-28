@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P7 管理后台轻量访问保护完成并上线。
+P7-1 后台保护验收与文档更新进行中（生产 ADMIN_ACCESS_CODE 待确认）。
 
 ## 线上地址
 
@@ -325,6 +325,17 @@ P7 管理后台轻量访问保护完成并上线。
 - 不涉及正式登录系统
 - 未新增用户表、OAuth、注册登录功能
 
+### P7-1 后台保护验收与文档更新
+
+- 线上无 cookie 访问 `/admin` 返回 503，而不是预期跳转到 `/admin/access`
+- 按 `web/proxy.ts` 逻辑，503 通常表示生产环境未配置 `ADMIN_ACCESS_CODE`
+- 已确认 `web/app/admin/layout.tsx` 仍保留 `noindex` / `nofollow`
+- 已补充 README、web/README、DEMO_GUIDE 中的 Admin Access Gate 说明
+- 文档明确：后台需要 `ADMIN_ACCESS_CODE`
+- 文档明确：不要写入或公开真实访问码
+- 文档明确：轻量访问门不是正式登录系统，正式生产使用前仍建议加入完整认证系统
+- 本次仅修改文档，不修改数据库 schema、不重新跑 migration、不修改业务逻辑
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -356,7 +367,7 @@ P0-P7 核心功能已全部完成。剩余任务：
 
 ## 下一阶段
 
-P7-1：后台保护验收与文档更新，或 P8 产品公开演示最终检查。
+P7-1：确认 Vercel 生产环境已配置 `ADMIN_ACCESS_CODE`，然后复测 `/admin` 跳转和正确访问码登录。
 
 ## 注意事项
 

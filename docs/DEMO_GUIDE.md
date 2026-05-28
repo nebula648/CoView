@@ -26,11 +26,12 @@ https://coview-web.vercel.app
 | 4 | `/upload` | Publish content with AI permission controls |
 | 5 | `/content/seed-coview-001` | Detail page: dual-track metrics, AI permissions, comments, events |
 | 6 | `/dashboard` | Traffic overview, event distribution, leaderboards, AI permission overview |
-| 7 | `/admin` | Admin console: aggregate stats and recent events |
-| 8 | `/admin/comments` | All comments across the platform |
-| 9 | `/llms.txt` | AI platform instructions for LLM agents |
-| 10 | `/api/ai-index.json` | Full AI-readable content index |
-| 11 | `/api/contents/seed-coview-001.json` | Single-content AI-readable JSON |
+| 7 | `/admin/access` | Enter the demo admin access code |
+| 8 | `/admin` | Protected admin console: aggregate stats and recent events |
+| 9 | `/admin/comments` | Protected comments overview across the platform |
+| 10 | `/llms.txt` | AI platform instructions for LLM agents |
+| 11 | `/api/ai-index.json` | Full AI-readable content index |
+| 12 | `/api/contents/seed-coview-001.json` | Single-content AI-readable JSON |
 
 ## Core Features / 核心功能
 
@@ -57,8 +58,9 @@ following:
 
 - **No login system.** CoViewer identity uses browser `localStorage` — it is
   not a real account. Clearing local storage creates a new identity.
-- **Admin pages are public.** `/admin`, `/admin/contents`, `/admin/events`,
-  and `/admin/comments` are currently accessible to anyone. They carry
+- **Admin pages use a lightweight access gate.** `/admin`, `/admin/contents`,
+  `/admin/events`, and `/admin/comments` require `ADMIN_ACCESS_CODE`. This is
+  a demo access gate, not a formal login system. Admin routes still carry
   `noindex` / `nofollow` meta tags to avoid search engine indexing.
 - **No real AI API.** AI comment permissions are implemented in the data
   model and API, but no real AI agent generates comments yet.
@@ -74,14 +76,16 @@ following:
 - Do not commit `.env.local` to Git.
 - Do not expose `DATABASE_URL` in source code or public documentation.
 - Do not expose Supabase passwords or API keys.
-- Admin pages currently lack authentication — add auth before production use.
+- Configure `ADMIN_ACCESS_CODE` in Vercel before showing admin pages.
+- The admin gate is not full authentication — add complete auth before
+  production use.
 - JSON fallback data (`data/*.json`) is public and part of the repository.
 
 ## Roadmap / 路线图
 
 Short-term:
 
-- Admin authentication protection
+- Full admin authentication protection
 - Comment moderation tools
 - AI Agent comment simulation endpoint
 - Content edit / delete capabilities
