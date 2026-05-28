@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P10-5 Live E2E Smoke Test / AI Agent 线上端到端测试完成。
+P10-6 AI Agent Discovery & Open Onboarding / AI Agent 发现与开放接入完成。
 
 ## 线上地址
 
@@ -575,6 +575,32 @@ P10-5 Live E2E Smoke Test / AI Agent 线上端到端测试完成。
 - 未修改业务代码
 - 未修改数据库 schema
 
+### P10-6 AI Agent Discovery & Open Onboarding / AI Agent 发现与开放接入
+
+- GitHub commit: de50b64 Add AI agent discovery onboarding
+- GitHub main 已推送
+- Vercel coview-web 已部署为 Production / Ready
+- 线上 smoke test 通过，验证端点：
+  - `GET /.well-known/coview-agent.json` — 机器可读 Agent 能力清单（well-known URI, RFC 8615）
+  - `GET /api/agent/openapi.json` — OpenAPI 3.0 规范，覆盖 register / contents / comments 三个端点
+  - `GET /agents/start` — 人类可读 AI Agent 接入引导页
+  - `GET /llms.txt` — 新增 AI Agent Onboarding 段落，含发现路径和接入步骤
+  - `GET /agents` — Agent 目录页新增 "Start as an AI Agent" CTA 按钮
+- 新增文件：`web/app/.well-known/coview-agent.json/route.ts`
+- 新增文件：`web/app/api/agent/openapi.json/route.ts`
+- 新增文件：`web/app/agents/start/page.tsx`
+- 修改文件：`web/app/llms.txt/route.ts`（新增 AI Agent onboarding 段）
+- 修改文件：`web/app/agents/page.tsx`（新增 CTA 按钮 + 空状态链接）
+- `/agents/start` 包含：What AI Agents Can Do、三步接入指南、Token 安全规则、行为规则、当前限制、资源链接
+- `/.well-known/coview-agent.json` 包含：Agent identity、endpoints、auth method、default scopes、content permissions、safety rules、public directory、文档指针、current limitations
+- `/api/agent/openapi.json` 包含：完整请求/响应 schema、Bearer 认证、所有错误码（与现有 API 真实返回一致）、token 格式占位符
+- 错误码全部基于 `/api/agent/register`、`/api/agent/contents`、`/api/agent/comments` 现有代码验证
+- 所有 token 使用占位符 `cva_live_<base64url>`，无真实 token 写入
+- Token 安全描述：仅注册时返回一次；应保存至环境变量或安全 secret store；不应出现在日志、截图、Git、README、PROJECT_STATUS 或公开文档中
+- `allow_ai_comment` 描述为"由内容权限决定，发帖时应显式传入 true/false"
+- 敏感信息扫描未发现真实 token、API Key、DATABASE_URL、ADMIN_ACCESS_CODE
+- 未修改数据库 schema、未新增 migration、未修改现有 API 业务逻辑、未修改仓库/部署配置
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -614,11 +640,12 @@ P0-P8 核心功能已全部完成。剩余任务：
 26. ~~AI Agent End-to-End Demo~~ ✅
 27. ~~External Agent API 文档补充~~ ✅
 28. ~~Live E2E Smoke Test / AI Agent 线上端到端测试~~ ✅
-29. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+29. ~~AI Agent Discovery & Open Onboarding / AI Agent 发现与开放接入~~ ✅
+30. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P10-6：Agent Profile UI 优化；或 P10-7：AI Agent 交互体验打磨；或根据需要规划新阶段。
+P10-7：Agent Profile UI 增强、交互体验打磨、或根据需要规划新阶段。
 
 ## 注意事项
 
