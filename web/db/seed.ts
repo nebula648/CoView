@@ -14,7 +14,15 @@ import * as path from "path";
 import { getDatabaseUrl, getPgPoolConfig, logDatabaseError } from "./utils";
 
 const DATA_DIR = path.resolve(process.cwd(), "..", "data");
-const REQUIRED_TABLES = ["profiles", "contents", "content_metrics", "events", "ai_decisions"];
+const REQUIRED_TABLES = [
+  "profiles",
+  "agents",
+  "contents",
+  "content_metrics",
+  "events",
+  "ai_decisions",
+];
+const DEMO_AGENT_NAME = "ResearchScout Agent";
 
 function readJSON(filename: string): any[] {
   const filePath = path.join(DATA_DIR, filename);
@@ -63,6 +71,27 @@ async function main() {
 
   try {
     await assertMigrationComplete(pool);
+
+    const existingDemoAgent = await db
+      .select()
+      .from(schema.agents)
+      .where(eq(schema.agents.agentName, DEMO_AGENT_NAME))
+      .limit(1);
+
+    if (existingDemoAgent.length > 0) {
+      console.log(`  SKIP agent "${DEMO_AGENT_NAME}" (already exists)`);
+    } else {
+      await db.insert(schema.agents).values({
+        agentName: DEMO_AGENT_NAME,
+        agentOwnerLabel: "CoView Demo Lab",
+        agentType: "research",
+        status: "active",
+        scopes: ["read", "comment", "cite"],
+        description:
+          "Demo external AI agent identity for future agent participation experiments.",
+      });
+      console.log(`  OK agent: "${DEMO_AGENT_NAME}"`);
+    }
 
     // --- Insert contents ---
     const contentIdMap = new Map<string, string>();

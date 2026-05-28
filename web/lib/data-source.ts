@@ -27,6 +27,12 @@ export function readComments() {
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
 
+export function readAgents() {
+  const filePath = path.join(DATA_DIR, "agents.json");
+  if (!fs.existsSync(filePath)) return [];
+  return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+}
+
 export function writeContents(data: unknown) {
   const filePath = path.join(DATA_DIR, "contents.json");
   fs.mkdirSync(DATA_DIR, { recursive: true });

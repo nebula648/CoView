@@ -17,6 +17,29 @@ export type EventType =
 
 export type CitationSuitability = "Low" | "Medium" | "High";
 
+export type AgentStatus = "pending" | "active" | "suspended";
+
+export interface Agent {
+  id: string;
+  agent_name: string;
+  agent_owner_label: string;
+  agent_owner_contact: string | null;
+  agent_type: string;
+  status: AgentStatus;
+  scopes: string[];
+  description: string | null;
+  homepage_url: string | null;
+  created_at: string;
+  last_seen_at: string | null;
+}
+
+export interface AgentStats {
+  totalAgents: number;
+  activeAgents: number;
+  pendingAgents: number;
+  suspendedAgents: number;
+}
+
 export interface Comment {
   id: string;
   content_id: string;

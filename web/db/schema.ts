@@ -19,6 +19,28 @@ export const profiles = pgTable("profiles", {
   lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const agents = pgTable(
+  "agents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    agentName: text("agent_name").notNull(),
+    agentOwnerLabel: text("agent_owner_label").notNull(),
+    agentOwnerContact: text("agent_owner_contact"),
+    agentType: text("agent_type").default("assistant").notNull(),
+    status: text("status").default("pending").notNull(),
+    scopes: jsonb("scopes").$type<string[]>().default(["read"]).notNull(),
+    description: text("description"),
+    homepageUrl: text("homepage_url"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("idx_agents_status").on(table.status),
+    index("idx_agents_type").on(table.agentType),
+    index("idx_agents_created").on(table.createdAt.desc()),
+  ],
+);
+
 export const contents = pgTable("contents", {
   id: uuid("id").defaultRandom().primaryKey(),
   slug: text("slug").unique().notNull(),

@@ -2,6 +2,7 @@ import { getDB } from "@/lib/db";
 import { schema } from "@/lib/db";
 import { eq, and, gte, desc, sql, or } from "drizzle-orm";
 import {
+  readAgents,
   readComments,
   readContents,
   readEvents,
@@ -12,9 +13,36 @@ import {
   writeProfiles,
 } from "@/lib/data-source";
 import { hashUA, hashIP } from "@/lib/dedup";
-import type { AdminComment, CommentStats } from "@/lib/types";
+import type { AdminComment, Agent, AgentStats, CommentStats } from "@/lib/types";
 
 const DEFAULT_AUTHOR_NAME = "CoView Demo Author";
+
+/* ------------------------------------------------------------------ */
+/*  External AI Agents                                                  */
+/* ------------------------------------------------------------------ */
+
+export async function getAgents(): Promise<Agent[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.agents)
+        .orderBy(desc(schema.agents.createdAt));
+      return rows.map(mapDBAgent);
+    },
+    () => readAgents().map(ensureAgentShape),
+  );
+}
+
+export async function getAgentStats(): Promise<AgentStats> {
+  const agents = await getAgents();
+  return {
+    totalAgents: agents.length,
+    activeAgents: agents.filter((agent) => agent.status === "active").length,
+    pendingAgents: agents.filter((agent) => agent.status === "pending").length,
+    suspendedAgents: agents.filter((agent) => agent.status === "suspended").length,
+  };
+}
 
 /* ------------------------------------------------------------------ */
 /*  Lightweight Profiles                                                */
@@ -1036,6 +1064,51 @@ function mapDBProfile(row: any): any {
       ? new Date(row.lastSeenAt).toISOString()
       : "",
   };
+}
+
+function mapDBAgent(row: any): Agent {
+  return {
+    id: row.id,
+    agent_name: row.agentName,
+    agent_owner_label: row.agentOwnerLabel,
+    agent_owner_contact: row.agentOwnerContact ?? null,
+    agent_type: row.agentType ?? "assistant",
+    status: normalizeAgentStatus(row.status),
+    scopes: Array.isArray(row.scopes) ? row.scopes : [],
+    description: row.description ?? null,
+    homepage_url: row.homepageUrl ?? null,
+    created_at: row.createdAt
+      ? new Date(row.createdAt).toISOString().replace("T", " ").substring(0, 19)
+      : "",
+    last_seen_at: row.lastSeenAt
+      ? new Date(row.lastSeenAt).toISOString().replace("T", " ").substring(0, 19)
+      : null,
+  };
+}
+
+function ensureAgentShape(agent: any): Agent {
+  return {
+    id: agent.id ?? crypto.randomUUID(),
+    agent_name: agent.agent_name ?? agent.agentName ?? "Unnamed Agent",
+    agent_owner_label:
+      agent.agent_owner_label ?? agent.agentOwnerLabel ?? "Unknown Owner",
+    agent_owner_contact: agent.agent_owner_contact ?? agent.agentOwnerContact ?? null,
+    agent_type: agent.agent_type ?? agent.agentType ?? "assistant",
+    status: normalizeAgentStatus(agent.status),
+    scopes: Array.isArray(agent.scopes) ? agent.scopes : [],
+    description: agent.description ?? null,
+    homepage_url: agent.homepage_url ?? agent.homepageUrl ?? null,
+    created_at:
+      agent.created_at ??
+      agent.createdAt ??
+      new Date().toISOString().replace("T", " ").substring(0, 19),
+    last_seen_at: agent.last_seen_at ?? agent.lastSeenAt ?? null,
+  };
+}
+
+function normalizeAgentStatus(status: string | undefined): Agent["status"] {
+  if (status === "active" || status === "suspended") return status;
+  return "pending";
 }
 
 function mapDBComment(row: any): any {

@@ -19,6 +19,24 @@ CREATE TABLE IF NOT EXISTS profiles (
   last_seen_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS agents (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  agent_name TEXT NOT NULL,
+  agent_owner_label TEXT NOT NULL,
+  agent_owner_contact TEXT,
+  agent_type TEXT DEFAULT 'assistant' NOT NULL,
+  status TEXT DEFAULT 'pending' NOT NULL,
+  scopes JSONB DEFAULT '["read"]'::jsonb NOT NULL,
+  description TEXT,
+  homepage_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+  last_seen_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
+CREATE INDEX IF NOT EXISTS idx_agents_type ON agents(agent_type);
+CREATE INDEX IF NOT EXISTS idx_agents_created ON agents(created_at DESC);
+
 CREATE TABLE IF NOT EXISTS contents (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   slug TEXT UNIQUE NOT NULL,
