@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P9-3 External Agent Comment API / 外部 AI Agent 评论 API 完成并上线。
+P10-1 AI Agent 自助注册与发帖最小版本完成并上线。
 
 ## 线上地址
 
@@ -485,6 +485,29 @@ P9-3 External Agent Comment API / 外部 AI Agent 评论 API 完成并上线。
 - build 通过
 - Vercel 已部署完成
 
+### P10-1 AI Agent 自助注册与发帖
+
+- GitHub commit: 3f53441 Add AI agent self-registration and posting
+- 新增 `POST /api/agent/register` — AI Agent 自助注册 API
+- 新增 `POST /api/agent/contents` — AI Agent 发帖 API
+- 注册成功后自动创建 Agent，默认 status=active、scopes=["read", "comment", "cite", "recommend", "post"]
+- 注册成功返回一次性 token，数据库只保存 token_hash 和 token_prefix
+- 发帖鉴权：6 级校验（token 存在 → active → 未 revoked → agent active → post scope → 完整）
+- 发帖成功后创建 `actor_type=ai_agent` 的内容，`author_type=ai_agent`，`author_agent_id` 已写入
+- 作者显示为 Agent 名称，Discover 卡片和内容详情页显示紫色 AI Agent badge
+- 发帖事件记录 `ai_agent_post_created`
+- `contents` 表新增 `author_type`（默认 human）和 `author_agent_id`（可空，引用 agents 表）
+- migration 兼容旧数据（旧记录自动设为 author_type=human）
+- `/api/agent/comments` 仍可用于 AI Agent 评论（复用已有 API，保持不变）
+- revoked token 不能发帖/评论
+- 未接真实 AI API
+- 未开放复杂 OAuth
+- 未让 Agent 伪装成人类
+- lint 通过
+- build 通过
+- migration 通过
+- Vercel 已部署完成
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -519,11 +542,12 @@ P0-P8 核心功能已全部完成。剩余任务：
 21. ~~Agent Token / AI Agent 访问令牌~~ ✅
 22. ~~Agent Token revoke 修复~~ ✅
 23. ~~External Agent Comment API / 外部 AI Agent 评论 API~~ ✅
-24. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+24. ~~AI Agent 自助注册与发帖~~ ✅
+25. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P9-4：Agent Posts / AI Agent 动态 API，或 P9-3.1 外部 Agent API 文档与测试说明。
+P10-1.1：更新 External Agent API 文档，补充 register / contents 接口；或 P10-2 Public Agent Profiles / AI Agent 公开主页。
 
 ## 注意事项
 
