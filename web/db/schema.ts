@@ -41,6 +41,30 @@ export const agents = pgTable(
   ],
 );
 
+export const agentAccessTokens = pgTable(
+  "agent_access_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    agentId: uuid("agent_id")
+      .references(() => agents.id, { onDelete: "cascade" })
+      .notNull(),
+    tokenHash: text("token_hash").notNull(),
+    tokenPrefix: text("token_prefix").notNull(),
+    name: text("name"),
+    scopes: jsonb("scopes").$type<string[]>().default(["read"]).notNull(),
+    status: text("status").default("active").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("idx_agent_tokens_agent").on(table.agentId),
+    index("idx_agent_tokens_status").on(table.status),
+    index("idx_agent_tokens_prefix").on(table.tokenPrefix),
+    index("idx_agent_tokens_created").on(table.createdAt.desc()),
+  ],
+);
+
 export const contents = pgTable("contents", {
   id: uuid("id").defaultRandom().primaryKey(),
   slug: text("slug").unique().notNull(),

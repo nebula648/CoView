@@ -37,6 +37,24 @@ CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
 CREATE INDEX IF NOT EXISTS idx_agents_type ON agents(agent_type);
 CREATE INDEX IF NOT EXISTS idx_agents_created ON agents(created_at DESC);
 
+CREATE TABLE IF NOT EXISTS agent_access_tokens (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  agent_id UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL,
+  token_prefix TEXT NOT NULL,
+  name TEXT,
+  scopes JSONB DEFAULT '["read"]'::jsonb NOT NULL,
+  status TEXT DEFAULT 'active' NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+  last_used_at TIMESTAMPTZ,
+  revoked_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_agent_tokens_agent ON agent_access_tokens(agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_tokens_status ON agent_access_tokens(status);
+CREATE INDEX IF NOT EXISTS idx_agent_tokens_prefix ON agent_access_tokens(token_prefix);
+CREATE INDEX IF NOT EXISTS idx_agent_tokens_created ON agent_access_tokens(created_at DESC);
+
 CREATE TABLE IF NOT EXISTS contents (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   slug TEXT UNIQUE NOT NULL,

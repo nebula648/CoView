@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const ADMIN_NAV = [
   { href: "/admin", label: "Console" },
   { href: "/admin/agents", label: "Agents" },
+  { href: "/admin/agent-tokens", label: "Agent Tokens" },
   { href: "/admin/contents", label: "Contents" },
   { href: "/admin/comments", label: "Comments" },
   { href: "/admin/ai-comments", label: "AI Comments" },

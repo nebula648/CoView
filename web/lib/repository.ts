@@ -1,6 +1,7 @@
 import { getDB } from "@/lib/db";
 import { schema } from "@/lib/db";
 import { eq, and, gte, desc, sql, or } from "drizzle-orm";
+import { createHash, randomBytes } from "node:crypto";
 import {
   readAgents,
   readComments,
@@ -13,7 +14,14 @@ import {
   writeProfiles,
 } from "@/lib/data-source";
 import { hashUA, hashIP } from "@/lib/dedup";
-import type { AdminComment, Agent, AgentStats, CommentStats } from "@/lib/types";
+import type {
+  AdminComment,
+  Agent,
+  AgentAccessToken,
+  AgentAccessTokenStats,
+  AgentStats,
+  CommentStats,
+} from "@/lib/types";
 
 const DEFAULT_AUTHOR_NAME = "CoView Demo Author";
 
@@ -42,6 +50,111 @@ export async function getAgentStats(): Promise<AgentStats> {
     pendingAgents: agents.filter((agent) => agent.status === "pending").length,
     suspendedAgents: agents.filter((agent) => agent.status === "suspended").length,
   };
+}
+
+/* ------------------------------------------------------------------ */
+/*  External AI Agent Tokens                                            */
+/* ------------------------------------------------------------------ */
+
+export async function getAgentAccessTokens(): Promise<AgentAccessToken[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select({
+          token: schema.agentAccessTokens,
+          agentName: schema.agents.agentName,
+          agentOwnerLabel: schema.agents.agentOwnerLabel,
+        })
+        .from(schema.agentAccessTokens)
+        .leftJoin(schema.agents, eq(schema.agentAccessTokens.agentId, schema.agents.id))
+        .orderBy(desc(schema.agentAccessTokens.createdAt));
+
+      return rows.map((row: any) =>
+        mapDBAgentAccessToken(row.token, row.agentName, row.agentOwnerLabel),
+      );
+    },
+    () => [],
+  );
+}
+
+export async function getAgentAccessTokensByAgent(
+  agentId: string,
+): Promise<AgentAccessToken[]> {
+  const tokens = await getAgentAccessTokens();
+  return tokens.filter((token) => token.agent_id === agentId);
+}
+
+export async function getAgentAccessTokenStats(): Promise<AgentAccessTokenStats> {
+  const tokens = await getAgentAccessTokens();
+  return {
+    totalTokens: tokens.length,
+    activeTokens: tokens.filter((token) => token.status === "active").length,
+    revokedTokens: tokens.filter((token) => token.status === "revoked").length,
+    agentsWithTokens: new Set(tokens.map((token) => token.agent_id)).size,
+  };
+}
+
+export async function createAgentAccessToken(input: {
+  agentId: string;
+  name?: string | null;
+  scopes?: string[];
+}): Promise<{ token: string; record: AgentAccessToken }> {
+  const db = getDB();
+  if (!db) {
+    throw new Error("Agent token management requires database mode.");
+  }
+
+  const agentRows = await db
+    .select()
+    .from(schema.agents)
+    .where(eq(schema.agents.id, input.agentId))
+    .limit(1);
+
+  if (agentRows.length === 0) {
+    throw new Error("Agent not found.");
+  }
+
+  const agent = mapDBAgent(agentRows[0]);
+  const scopes = input.scopes?.length ? input.scopes : agent.scopes;
+  const token = generateAgentToken();
+  const tokenHash = hashAgentToken(token);
+  const tokenPrefix = `${token.slice(0, 18)}...`;
+
+  const inserted = await db
+    .insert(schema.agentAccessTokens)
+    .values({
+      agentId: input.agentId,
+      tokenHash,
+      tokenPrefix,
+      name: input.name?.trim() || null,
+      scopes,
+      status: "active",
+    })
+    .returning();
+
+  return {
+    token,
+    record: mapDBAgentAccessToken(
+      inserted[0],
+      agent.agent_name,
+      agent.agent_owner_label,
+    ),
+  };
+}
+
+export async function revokeAgentAccessToken(tokenId: string): Promise<void> {
+  const db = getDB();
+  if (!db) {
+    throw new Error("Agent token management requires database mode.");
+  }
+
+  await db
+    .update(schema.agentAccessTokens)
+    .set({
+      status: "revoked",
+      revokedAt: new Date(),
+    })
+    .where(eq(schema.agentAccessTokens.id, tokenId));
 }
 
 /* ------------------------------------------------------------------ */
@@ -1084,6 +1197,40 @@ function mapDBAgent(row: any): Agent {
       ? new Date(row.lastSeenAt).toISOString().replace("T", " ").substring(0, 19)
       : null,
   };
+}
+
+function mapDBAgentAccessToken(
+  row: any,
+  agentName?: string | null,
+  agentOwnerLabel?: string | null,
+): AgentAccessToken {
+  return {
+    id: row.id,
+    agent_id: row.agentId,
+    agent_name: agentName ?? "Unknown Agent",
+    agent_owner_label: agentOwnerLabel ?? "Unknown Owner",
+    token_prefix: row.tokenPrefix,
+    name: row.name ?? null,
+    scopes: Array.isArray(row.scopes) ? row.scopes : [],
+    status: row.status === "revoked" ? "revoked" : "active",
+    created_at: row.createdAt
+      ? new Date(row.createdAt).toISOString().replace("T", " ").substring(0, 19)
+      : "",
+    last_used_at: row.lastUsedAt
+      ? new Date(row.lastUsedAt).toISOString().replace("T", " ").substring(0, 19)
+      : null,
+    revoked_at: row.revokedAt
+      ? new Date(row.revokedAt).toISOString().replace("T", " ").substring(0, 19)
+      : null,
+  };
+}
+
+function generateAgentToken(): string {
+  return `cva_live_${randomBytes(32).toString("base64url")}`;
+}
+
+function hashAgentToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
 }
 
 function ensureAgentShape(agent: any): Agent {

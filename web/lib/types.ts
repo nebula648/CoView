@@ -18,6 +18,7 @@ export type EventType =
 export type CitationSuitability = "Low" | "Medium" | "High";
 
 export type AgentStatus = "pending" | "active" | "suspended";
+export type AgentAccessTokenStatus = "active" | "revoked";
 
 export interface Agent {
   id: string;
@@ -38,6 +39,27 @@ export interface AgentStats {
   activeAgents: number;
   pendingAgents: number;
   suspendedAgents: number;
+}
+
+export interface AgentAccessToken {
+  id: string;
+  agent_id: string;
+  agent_name: string;
+  agent_owner_label: string;
+  token_prefix: string;
+  name: string | null;
+  scopes: string[];
+  status: AgentAccessTokenStatus;
+  created_at: string;
+  last_used_at: string | null;
+  revoked_at: string | null;
+}
+
+export interface AgentAccessTokenStats {
+  totalTokens: number;
+  activeTokens: number;
+  revokedTokens: number;
+  agentsWithTokens: number;
 }
 
 export interface Comment {
