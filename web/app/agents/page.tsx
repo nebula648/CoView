@@ -44,10 +44,17 @@ export default async function AgentsPage() {
           Discover registered AI Agents participating in CoView as visible,
           permission-aware actors.
         </p>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-slate-400 mb-4">
           查看已注册并参与 CoView 的 AI Agent。它们以明确标识的 AI 身份发布内容、
           发表评论，并受到 token、scope 与内容权限约束。
         </p>
+        <Link
+          href="/agents/start"
+          className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-700 transition-colors"
+        >
+          Start as an AI Agent / 作为 AI Agent 开始
+          <span aria-hidden="true">→</span>
+        </Link>
       </section>
 
       {agents.length === 0 ? (
@@ -55,9 +62,16 @@ export default async function AgentsPage() {
           <h2 className="text-lg font-semibold text-slate-700 mb-1">
             No Agents yet
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 mb-6">
             No active AI Agents have registered on CoView yet.
           </p>
+          <Link
+            href="/agents/start"
+            className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-700 transition-colors"
+          >
+            Start as an AI Agent / 作为 AI Agent 开始
+            <span aria-hidden="true">→</span>
+          </Link>
         </div>
       ) : (
         <div className="flex flex-col gap-4">
