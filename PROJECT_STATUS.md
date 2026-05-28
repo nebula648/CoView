@@ -2,7 +2,8 @@
 
 ## 当前阶段
 
-P8-2 产品公开演示最终收尾完成。
+P9-1 Agent Registry / 外部 AI Agent 身份注册表完成并上线。
+P9-1.1 Agents 页面 UI 文案 polish 完成并上线。
 
 ## 线上地址
 
@@ -390,6 +391,42 @@ P8-2 产品公开演示最终收尾完成。
 - 不涉及真实 AI API
 - 不涉及正式登录系统
 
+### P9-1 Agent Registry / 外部 AI Agent 身份注册表
+
+- GitHub commit: cbe9cb1 Add external AI agent registry
+- 新增 `agents` 表
+- seed 示例 Agent：ResearchScout Agent
+- 新增 `/admin/agents`
+- `/admin/agents` 受 Admin Access Gate 保护
+- Admin 导航和后台首页已加入 Agents
+- Agents 页面保持只读
+- 页面展示 Agent 总数、活跃 Agent、待审核 Agent、已暂停 Agent
+- 页面展示 agent name、owner、type、status、scopes、created_at、last_seen_at、homepage
+- 未生成 Agent token
+- 未开放外部写入 API
+- 未接真实 AI API
+- 未修改评论、上传、AI 评论模拟逻辑
+- lint 通过
+- build 通过
+- migration 通过
+- seed 通过
+- Vercel 已部署完成
+
+### P9-1.1 Agents 页面 UI 文案 polish
+
+- GitHub commit: 0efd9e4 Polish agents admin copy
+- 已优化 Agents 页面中英双语文案
+- 页面标题整理为 Agents / AI Agent 管理
+- 页面说明明确当前仍是 registry-only phase
+- 统计卡片统一为中英双语
+- 表格列名统一为 AGENT / Agent、OWNER / 所属方、TYPE / 类型、STATUS / 状态、SCOPES / 权限范围、CREATED / 创建时间、LAST SEEN / 最近活跃、HOMEPAGE / 主页
+- 未生成 Agent token
+- 未开放外部写入 API
+- 未接真实 AI API
+- 未修改评论、上传、AI 评论模拟逻辑
+- lint 通过
+- build 通过
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -419,11 +456,13 @@ P0-P8 核心功能已全部完成。剩余任务：
 16. ~~管理后台轻量访问保护~~ ✅
 17. ~~AI Agent Comment Simulation~~ ✅
 18. ~~产品公开演示最终收尾~~ ✅
-19. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+19. ~~Agent Registry / 外部 AI Agent 身份注册表~~ ✅
+20. ~~Agents 页面 UI 文案 polish~~ ✅
+21. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P9：公开演示后的产品规划，或继续增强 Mock AI Agent 行为模拟。
+P9-2：Agent Token / AI Agent 访问令牌，或先单独处理 `docs/DEMO_SCRIPT.md` 演示讲解稿。
 
 ## 注意事项
 
