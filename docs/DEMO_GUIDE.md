@@ -77,6 +77,9 @@ following:
 - Do not expose `DATABASE_URL` in source code or public documentation.
 - Do not expose Supabase passwords or API keys.
 - Configure `ADMIN_ACCESS_CODE` in Vercel before showing admin pages.
+- The production demo uses Vercel Production environment variable
+  `ADMIN_ACCESS_CODE`; the real code must not be written in docs or source
+  code.
 - The admin gate is not full authentication — add complete auth before
   production use.
 - JSON fallback data (`data/*.json`) is public and part of the repository.

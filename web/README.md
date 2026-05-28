@@ -105,6 +105,10 @@ Set `ADMIN_ACCESS_CODE` in local and Vercel environment variables before
 visiting the admin console. The access gate stores an httpOnly cookie after a
 successful code check.
 
+For the hosted demo, `ADMIN_ACCESS_CODE` is configured in Vercel Production
+environment variables. Do not write the real access code in docs, commits, or
+source code.
+
 This is not a formal login system. Before production use, replace it or extend
 it with full authentication, authorization, audit logging, and session
 management.

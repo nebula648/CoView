@@ -101,6 +101,8 @@ Do not paste real credentials into source code or public documentation.
 - Do not expose `DATABASE_URL`, database passwords, or API keys.
 - Admin pages use a lightweight `ADMIN_ACCESS_CODE` access gate. This is not a
   formal login system; add full authentication before production use.
+- On Vercel Production, configure `ADMIN_ACCESS_CODE` as an environment
+  variable. Never write the real access code in documentation or source code.
 - This is a research prototype. Do not publish sensitive data.
 
 ## License
