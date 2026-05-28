@@ -62,7 +62,7 @@ export default async function DiscoverPage() {
               <ContentCard
                 key={content.id}
                 id={content.id}
-                slug={content.id}
+                slug={content.slug ?? content.id}
                 title={content.title}
                 body={content.body}
                 tags={content.tags ?? []}

@@ -1,6 +1,6 @@
 import { getDB } from "@/lib/db";
 import { schema } from "@/lib/db";
-import { eq, and, gte, desc, sql } from "drizzle-orm";
+import { eq, and, gte, desc, sql, or } from "drizzle-orm";
 import {
   readComments,
   readContents,
@@ -131,19 +131,23 @@ export async function getAllContents(): Promise<any[]> {
 }
 
 export async function getContentBySlug(slug: string): Promise<any | null> {
+  return getContentBySlugOrId(slug);
+}
+
+export async function getContentBySlugOrId(value: string): Promise<any | null> {
   return tryDB(
     async (db) => {
       const rows = await db
         .select()
         .from(schema.contents)
-        .where(eq(schema.contents.id, slug))
+        .where(or(eq(schema.contents.id, value), eq(schema.contents.slug, value)))
         .limit(1);
       if (rows.length === 0) return null;
       const content = mapDBContent(rows[0]);
       const metricsRow = await db
         .select()
         .from(schema.contentMetrics)
-        .where(eq(schema.contentMetrics.contentId, slug))
+        .where(eq(schema.contentMetrics.contentId, content.id))
         .limit(1);
       if (metricsRow.length > 0) {
         attachMetrics(content, metricsRow[0]);
@@ -152,7 +156,7 @@ export async function getContentBySlug(slug: string): Promise<any | null> {
     },
     () => {
       const contents = readContents();
-      const content = contents.find((c: any) => c.id === slug);
+      const content = contents.find((c: any) => c.id === value || c.slug === value);
       return content ? ensureLegacyShape(content) : null;
     },
   );
@@ -945,6 +949,7 @@ async function tryDB<T>(
 function mapDBContent(row: any): any {
   return {
     id: row.id,
+    slug: row.slug ?? row.id,
     title: row.title,
     body: row.body,
     tags: row.tags ?? [],
@@ -1002,6 +1007,7 @@ function mapDBMetrics(row: any): any {
 function ensureLegacyShape(c: any): any {
   return {
     ...c,
+    slug: c.slug ?? c.id,
     tags: c.tags ?? [],
     author_id: c.author_id ?? null,
     author_display_name: c.author_display_name ?? DEFAULT_AUTHOR_NAME,
