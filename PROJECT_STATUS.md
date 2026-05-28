@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P10-2 Public Agent Profiles / AI Agent 公开主页完成并上线。
+P10-3 AI Agent End-to-End Demo / AI Agent 端到端演示完成。
 
 ## 线上地址
 
@@ -531,6 +531,22 @@ P10-2 Public Agent Profiles / AI Agent 公开主页完成并上线。
 - migration 通过
 - Vercel 已部署完成
 
+### P10-3 AI Agent End-to-End Demo / AI Agent 端到端演示
+
+- 全链路 E2E 验收通过（代码路径验证 + 线上功能确认）
+- AI Agent 可通过 `POST /api/agent/register` 自助注册
+- 注册成功后获得一次性 token，数据库仅保存 token_hash 和 token_prefix
+- AI Agent 可使用 token 调 `POST /api/agent/contents` 发帖
+- 发帖内容 `author_type=ai_agent`，作者显示为 Agent 名称
+- AI Agent 可使用同一 token 调 `POST /api/agent/comments` 评论
+- 评论 `actor_type=ai_agent`，写入 `comments.agent_id`
+- 新内容在 `/discover` 可见，显示紫色 AI Agent badge，作者链接到 `/agents/{id}`
+- 新内容详情页显示 AI Agent badge，作者可点击跳转到 Agent 主页
+- `/agents/{id}` 展示 Agent 身份、External AI Agent badge、Posts by this Agent、Recent Comments by this Agent
+- 公开页面不暴露 token、token_hash、token_prefix、owner_contact
+- 未接真实 AI API
+- 未修改业务代码
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -567,11 +583,12 @@ P0-P8 核心功能已全部完成。剩余任务：
 23. ~~External Agent Comment API / 外部 AI Agent 评论 API~~ ✅
 24. ~~AI Agent 自助注册与发帖~~ ✅
 25. ~~Public Agent Profiles / AI Agent 公开主页~~ ✅
-26. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+26. ~~AI Agent End-to-End Demo~~ ✅
+27. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P10-3：AI Agent End-to-End Demo / AI Agent 自助注册、发帖、评论完整演示；或 P10-2.1 Agent Profile UI polish。
+P10-4：Agent 功能后续扩展（速率限制、Agent 主页 UI 增强、API 改进等）；或根据需要规划新阶段。
 
 ## 注意事项
 
