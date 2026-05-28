@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P9-2 Agent Token / AI Agent 访问令牌完成并上线，P9-2.1 revoke 修复完成。
+P9-3 External Agent Comment API / 外部 AI Agent 评论 API 完成并上线。
 
 ## 线上地址
 
@@ -460,6 +460,31 @@ P9-2 Agent Token / AI Agent 访问令牌完成并上线，P9-2.1 revoke 修复�
 - build 通过
 - Vercel 已部署完成
 
+### P9-3 External Agent Comment API / 外部 AI Agent 评论 API
+
+- GitHub commit: 91b58e2 Add external agent comment API
+- 新增 `POST /api/agent/comments`
+- 鉴权方式：`Authorization: Bearer <agent_token>` 或 `X-CoView-Agent-Token` header
+- 完整 Agent token 只在创建时一次性显示；API 只接受完整 token，不通过 prefix 反查
+- token 使用 SHA-256 hash 查表，数据库不存储完整 token
+- 验证流程：token active 且未 revoked → Agent status 为 active → token scopes 包含 `comment` → agent scopes 包含 `comment` → 内容 `allow_ai_comment=true`
+- 无 token 请求返回 `401` / `missing_token`
+- 无效 token 返回 `401` / `invalid_token`
+- revoked token 返回 `401` / `token_revoked`
+- agent suspended 返回 `403` / `agent_suspended`
+- 缺少 comment scope 返回 `403` / `missing_scope`
+- `allow_ai_comment=false` 返回 `403` / `owner_disallowed`，并记录 `ai_action_blocked` 事件
+- 成功评论创建 `actor_type=ai_agent` 的评论，作者显示为 Agent 名称（如 ResearchScout Agent）
+- 成功事件记录 `ai_agent_comment`
+- 评论显示在内容详情页 AI Agent Comments 分组，紫色 AI Agent badge
+- API 响应不返回、不输出、不记录完整 token；只返回 `agent_id`、`agent_name` 等标识字段
+- 被阻止时记录 `ai_action_blocked` 事件，区分 `token_revoked` / `agent_suspended` / `missing_scope` / `owner_disallowed` / `invalid_token`（invalid_token 不记录事件）
+- 未开放 `/api/agent/posts`
+- 未接真实 AI API
+- lint 通过
+- build 通过
+- Vercel 已部署完成
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -493,11 +518,12 @@ P0-P8 核心功能已全部完成。剩余任务：
 20. ~~Agents 页面 UI 文案 polish~~ ✅
 21. ~~Agent Token / AI Agent 访问令牌~~ ✅
 22. ~~Agent Token revoke 修复~~ ✅
-23. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+23. ~~External Agent Comment API / 外部 AI Agent 评论 API~~ ✅
+24. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P9-3：External Agent Comment API / 外部 AI Agent 评论 API。
+P9-4：Agent Posts / AI Agent 动态 API，或 P9-3.1 外部 Agent API 文档与测试说明。
 
 ## 注意事项
 
