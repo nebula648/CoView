@@ -9,6 +9,7 @@ interface ContentCardProps {
   createdAt: string;
   authorDisplayName?: string | null;
   authorType?: string | null;
+  authorUsername?: string | null;
   aiSummary?: string | null;
   aiTags?: string[];
   authorAgentId?: string | null;
@@ -63,6 +64,7 @@ export function ContentCard({
   createdAt,
   authorDisplayName,
   authorType,
+  authorUsername,
   authorAgentId,
   aiSummary,
   aiTags,
@@ -119,6 +121,17 @@ export function ContentCard({
             >
               Posted by {authorDisplayName ?? "AI Agent"}
             </Link>
+          ) : authorUsername ? (
+            <Link
+              href={`/users/${authorUsername}`}
+              className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              Posted by {authorDisplayName ?? "Human User"}
+            </Link>
+          ) : authorType === "ai_agent" ? (
+            <span className="text-xs text-purple-600">
+              Posted by {authorDisplayName ?? "AI Agent"}
+            </span>
           ) : (
             <span className="text-xs text-slate-400">
               Posted by {authorDisplayName ?? "CoView Demo Author"}
@@ -135,6 +148,13 @@ export function ContentCard({
             <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
               AI Agent
             </span>
+          ) : authorUsername ? (
+            <Link
+              href={`/users/${authorUsername}`}
+              className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-200 transition-colors"
+            >
+              Human User
+            </Link>
           ) : null}
           {displayTags.length > 0 && (
             <div className="flex flex-wrap gap-1">

@@ -164,16 +164,30 @@ export default async function ContentDetailPage({
             >
               Posted by {content.author_display_name ?? "AI Agent"}
             </Link>
+          ) : content.author_username ? (
+            <Link
+              href={`/users/${content.author_username}`}
+              className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              Posted by {content.author_display_name ?? "Human User"}
+            </Link>
           ) : (
             <span className="text-sm text-slate-400">
               Posted by {content.author_display_name ?? "CoView Demo Author"}
             </span>
           )}
-          {(content.author_type ?? "human") === "ai_agent" && (
+          {(content.author_type ?? "human") === "ai_agent" ? (
             <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-[11px] font-semibold text-purple-700">
               AI Agent
             </span>
-          )}
+          ) : content.author_username ? (
+            <Link
+              href={`/users/${content.author_username}`}
+              className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-200 transition-colors"
+            >
+              Human User
+            </Link>
+          ) : null}
 
           {(content.tags ?? []).length > 0 && (
             <div className="flex flex-wrap gap-1">

@@ -80,9 +80,18 @@ export function Sidebar() {
           <span className="text-gray-300">Loading...</span>
         ) : session.authed ? (
           <div className="flex flex-col gap-1">
-            <span className="text-slate-600 font-medium truncate">
+            <Link
+              href="/me"
+              className="text-slate-600 font-medium truncate hover:text-slate-800 transition-colors"
+            >
               {session.username ?? "User"}
-            </span>
+            </Link>
+            <Link
+              href="/settings/profile"
+              className="text-left text-gray-400 hover:text-slate-600 transition-colors text-[11px]"
+            >
+              Settings / 设置
+            </Link>
             <button
               type="button"
               onClick={handleLogout}

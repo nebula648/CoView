@@ -57,6 +57,7 @@ export default function UploadPage() {
   const [allowAiComment, setAllowAiComment] = useState(true);
   const [status, setStatus] = useState<Status | null>(null);
   const [profile, setProfile] = useState<VisitorProfile | null>(null);
+  const [isSessionUser, setIsSessionUser] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   const parsedTags = tagsText
@@ -66,22 +67,36 @@ export default function UploadPage() {
 
   useEffect(() => {
     let isMounted = true;
-    ensureVisitorProfile()
-      .then((visitorProfile) => {
+    async function resolveIdentity() {
+      try {
+        const sessionRes = await fetch("/api/auth/session");
+        const sessionData = await sessionRes.json();
+        if (sessionData.authed && sessionData.profileType === "human_user") {
+          if (isMounted) {
+            setProfile({
+              profileId: sessionData.profileId,
+              displayName: sessionData.username,
+            } as VisitorProfile);
+            setIsSessionUser(true);
+          }
+          return;
+        }
+      } catch { /* fall through to guest */ }
+      try {
+        const visitorProfile = await ensureVisitorProfile();
         if (isMounted) setProfile(visitorProfile);
-      })
-      .catch(() => {
+      } catch {
         if (isMounted) {
           setStatus({
             type: "error",
             msg: "Unable to create your visitor identity. Please refresh and try again.",
           });
         }
-      })
-      .finally(() => {
-        if (isMounted) setIsLoadingProfile(false);
-      });
-
+      }
+    }
+    resolveIdentity().finally(() => {
+      if (isMounted) setIsLoadingProfile(false);
+    });
     return () => {
       isMounted = false;
     };
@@ -126,6 +141,7 @@ export default function UploadPage() {
         tags: parsedTags,
         authorId: activeProfile.profileId,
         authorDisplayName: activeProfile.displayName,
+        authorType: isSessionUser ? "human_user" : "human_guest",
         allowAiView,
         allowAiSave,
         allowAiCite,
@@ -196,7 +212,9 @@ export default function UploadPage() {
         <div className="mt-5 inline-flex rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-slate-100">
           {isLoadingProfile
             ? "Loading identity..."
-            : `Current identity: ${profile?.displayName ?? "Unknown visitor"}`}
+            : isSessionUser
+              ? `Signed in as @${profile?.displayName ?? "User"}`
+              : `Current identity: ${profile?.displayName ?? "Unknown visitor"}`}
         </div>
       </section>
 

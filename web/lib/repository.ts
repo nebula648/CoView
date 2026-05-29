@@ -371,6 +371,77 @@ export async function getAgentProfileStats(agentId: string): Promise<{
 }
 
 /* ------------------------------------------------------------------ */
+/*  Profile-content queries                                             */
+/* ------------------------------------------------------------------ */
+
+export async function getContentsByProfileId(profileId: string): Promise<any[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select({
+          content: schema.contents,
+          metrics: schema.contentMetrics,
+          profile: schema.profiles,
+        })
+        .from(schema.contents)
+        .leftJoin(
+          schema.contentMetrics,
+          eq(schema.contentMetrics.contentId, schema.contents.id),
+        )
+        .leftJoin(
+          schema.profiles,
+          eq(schema.contents.authorId, schema.profiles.id),
+        )
+        .where(eq(schema.contents.authorId, profileId))
+        .orderBy(desc(schema.contents.createdAt));
+      return rows.map((row: any) => {
+        const c = attachMetrics(mapDBContent(row.content), row.metrics);
+        c.author_username = row.profile?.username ?? null;
+        return c;
+      });
+    },
+    () => {
+      const profiles = readProfiles();
+      const profileMap = new Map(profiles.map((p: any) => [p.id, p.username]));
+      return readContents()
+        .filter((c: any) => c.author_id === profileId)
+        .map(ensureLegacyShape)
+        .map((c: any) => {
+          c.author_username = profileMap.get(c.author_id) ?? null;
+          return c;
+        });
+    },
+  );
+}
+
+export async function getCommentsByProfileId(
+  profileId: string,
+  limit: number = 50,
+): Promise<any[]> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.comments)
+        .where(eq(schema.comments.authorId, profileId))
+        .orderBy(desc(schema.comments.createdAt))
+        .limit(limit);
+      return rows.map(mapDBComment);
+    },
+    () => {
+      return readComments()
+        .filter((c: any) => c.author_id === profileId)
+        .map(ensureCommentShape)
+        .sort(
+          (a: any, b: any) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        )
+        .slice(0, limit);
+    },
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Lightweight Profiles                                                */
 /* ------------------------------------------------------------------ */
 
@@ -497,6 +568,64 @@ export async function getUserByUsername(username: string): Promise<any | null> {
   );
 }
 
+// Public profile — only for human_user, never exposes email or password_hash
+export async function getPublicProfileByUsername(username: string): Promise<any | null> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.profiles)
+        .where(
+          and(
+            eq(schema.profiles.username, username.toLowerCase().trim()),
+            eq(schema.profiles.profileType, "human_user"),
+          ),
+        )
+        .limit(1);
+      return rows.length > 0 ? mapDBPublicProfile(rows[0]) : null;
+    },
+    () => {
+      const profiles = readProfiles();
+      const match = profiles.find(
+        (p: any) =>
+          p.username === username.toLowerCase().trim() &&
+          p.profile_type === "human_user",
+      );
+      // Strip sensitive fields from JSON fallback
+      if (!match) return null;
+      const safe = { ...match };
+      delete safe.email;
+      delete safe.password_hash;
+      return safe;
+    },
+  );
+}
+
+// Own profile for settings — includes email, excludes password_hash
+export async function getUserProfileOwn(profileId: string): Promise<any | null> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.profiles)
+        .where(eq(schema.profiles.id, profileId))
+        .limit(1);
+      if (rows.length === 0) return null;
+      const full = mapDBProfile(rows[0]);
+      delete full.password_hash;
+      return full;
+    },
+    () => {
+      const profiles = readProfiles();
+      const match = profiles.find((p: any) => p.id === profileId);
+      if (!match) return null;
+      const safe = { ...match };
+      delete safe.password_hash;
+      return safe;
+    },
+  );
+}
+
 export async function registerUser(params: {
   username: string;
   displayName: string;
@@ -556,6 +685,46 @@ export async function registerUser(params: {
   profiles.push(profile);
   writeProfiles(profiles);
   return profile;
+}
+
+export async function updateUserProfile(
+  profileId: string,
+  fields: {
+    displayName?: string;
+    bio?: string | null;
+    avatarUrl?: string | null;
+  },
+): Promise<any> {
+  const db = getDB();
+  if (db) {
+    const updateData: Record<string, unknown> = {};
+    if (fields.displayName !== undefined) {
+      updateData.displayName = fields.displayName;
+    }
+    if (fields.bio !== undefined) {
+      updateData.bio = fields.bio;
+    }
+    if (fields.avatarUrl !== undefined) {
+      updateData.avatarUrl = fields.avatarUrl;
+    }
+    const updated = await db
+      .update(schema.profiles)
+      .set(updateData as any)
+      .where(eq(schema.profiles.id, profileId))
+      .returning();
+    return mapDBPublicProfile(updated[0]);
+  }
+  const profiles = readProfiles();
+  const idx = profiles.findIndex((p: any) => p.id === profileId);
+  if (idx === -1) throw new Error("Profile not found");
+  if (fields.displayName !== undefined) profiles[idx].display_name = fields.displayName;
+  if (fields.bio !== undefined) profiles[idx].bio = fields.bio;
+  if (fields.avatarUrl !== undefined) profiles[idx].avatar_url = fields.avatarUrl;
+  writeProfiles(profiles);
+  const safe = { ...profiles[idx] };
+  delete safe.email;
+  delete safe.password_hash;
+  return safe;
 }
 
 /* ------------------------------------------------------------------ */
@@ -642,17 +811,35 @@ export async function getAllContents(): Promise<any[]> {
         .select({
           content: schema.contents,
           metrics: schema.contentMetrics,
+          profile: schema.profiles,
         })
         .from(schema.contents)
         .leftJoin(
           schema.contentMetrics,
           eq(schema.contentMetrics.contentId, schema.contents.id),
         )
+        .leftJoin(
+          schema.profiles,
+          eq(schema.contents.authorId, schema.profiles.id),
+        )
         .orderBy(desc(schema.contents.createdAt));
 
-      return rows.map((row: any) => attachMetrics(mapDBContent(row.content), row.metrics));
+      return rows.map((row: any) => {
+        const c = attachMetrics(mapDBContent(row.content), row.metrics);
+        c.author_username = row.profile?.username ?? null;
+        return c;
+      });
     },
-    () => readContents().map(ensureLegacyShape),
+    () => {
+      const profiles = readProfiles();
+      const profileMap = new Map(profiles.map((p: any) => [p.id, p.username]));
+      return readContents()
+        .map(ensureLegacyShape)
+        .map((c: any) => {
+          c.author_username = profileMap.get(c.author_id) ?? null;
+          return c;
+        });
+    },
   );
 }
 
@@ -664,12 +851,20 @@ export async function getContentBySlugOrId(value: string): Promise<any | null> {
   return tryDB(
     async (db) => {
       const rows = await db
-        .select()
+        .select({
+          content: schema.contents,
+          profile: schema.profiles,
+        })
         .from(schema.contents)
+        .leftJoin(
+          schema.profiles,
+          eq(schema.contents.authorId, schema.profiles.id),
+        )
         .where(or(eq(schema.contents.id, value), eq(schema.contents.slug, value)))
         .limit(1);
       if (rows.length === 0) return null;
-      const content = mapDBContent(rows[0]);
+      const content = mapDBContent(rows[0].content);
+      content.author_username = rows[0].profile?.username ?? null;
       const metricsRow = await db
         .select()
         .from(schema.contentMetrics)
@@ -683,7 +878,12 @@ export async function getContentBySlugOrId(value: string): Promise<any | null> {
     () => {
       const contents = readContents();
       const content = contents.find((c: any) => c.id === value || c.slug === value);
-      return content ? ensureLegacyShape(content) : null;
+      if (!content) return null;
+      const profiles = readProfiles();
+      const profile = profiles.find((p: any) => p.id === content.author_id);
+      const shaped = ensureLegacyShape(content);
+      shaped.author_username = profile?.username ?? null;
+      return shaped;
     },
   );
 }
@@ -957,8 +1157,15 @@ export async function getCommentsByContentId(contentId: string): Promise<any[]> 
   return tryDB(
     async (db) => {
       const rows = await db
-        .select()
+        .select({
+          comment: schema.comments,
+          profile: schema.profiles,
+        })
         .from(schema.comments)
+        .leftJoin(
+          schema.profiles,
+          eq(schema.comments.authorId, schema.profiles.id),
+        )
         .where(
           and(
             eq(schema.comments.contentId, contentId),
@@ -967,10 +1174,16 @@ export async function getCommentsByContentId(contentId: string): Promise<any[]> 
         )
         .orderBy(desc(schema.comments.createdAt));
 
-      return rows.map(mapDBComment);
+      return rows.map((row: any) => {
+        const c = mapDBComment(row.comment);
+        c.author_username = row.profile?.username ?? null;
+        return c;
+      });
     },
     () => {
       const comments = readComments();
+      const profiles = readProfiles();
+      const profileMap = new Map(profiles.map((p: any) => [p.id, p.username]));
       return comments
         .filter(
           (comment: any) =>
@@ -978,6 +1191,10 @@ export async function getCommentsByContentId(contentId: string): Promise<any[]> 
             (comment.status ?? "visible") === "visible",
         )
         .map(ensureCommentShape)
+        .map((c: any) => {
+          c.author_username = profileMap.get(c.author_id) ?? null;
+          return c;
+        })
         .sort(
           (a: any, b: any) =>
             new Date(b.created_at).getTime() -
@@ -1644,6 +1861,25 @@ function mapDBProfile(row: any): any {
     email: row.email ?? null,
     username: row.username ?? null,
     password_hash: row.passwordHash ?? null,
+    bio: row.bio ?? null,
+    avatar_url: row.avatarUrl ?? null,
+    created_at: row.createdAt
+      ? new Date(row.createdAt).toISOString()
+      : "",
+    last_seen_at: row.lastSeenAt
+      ? new Date(row.lastSeenAt).toISOString()
+      : "",
+  };
+}
+
+// Public-safe mapper: intentionally omits email and password_hash
+function mapDBPublicProfile(row: any): any {
+  return {
+    id: row.id,
+    display_number: row.displayNumber,
+    display_name: row.displayName,
+    profile_type: row.profileType,
+    username: row.username ?? null,
     bio: row.bio ?? null,
     avatar_url: row.avatarUrl ?? null,
     created_at: row.createdAt

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   ensureVisitorProfile,
   type VisitorProfile,
@@ -12,6 +13,8 @@ interface Comment {
   author_id: string | null;
   author_display_name: string;
   actor_type: "human" | "ai_agent";
+  author_username?: string | null;
+  agent_id?: string | null;
   body: string;
   status: "visible";
   created_at: string;
@@ -26,6 +29,7 @@ export function CommentSection({
 }) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [profile, setProfile] = useState<VisitorProfile | null>(null);
+  const [isSessionUser, setIsSessionUser] = useState(false);
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<{ type: "error" | "success"; msg: string } | null>(
     null,
@@ -49,22 +53,39 @@ export function CommentSection({
 
   useEffect(() => {
     let isMounted = true;
-    ensureVisitorProfile()
-      .then((visitorProfile) => {
+    async function resolveIdentity() {
+      try {
+        const sessionRes = await fetch("/api/auth/session");
+        const sessionData = await sessionRes.json();
+        if (
+          sessionData.authed &&
+          sessionData.profileType === "human_user"
+        ) {
+          if (isMounted) {
+            setProfile({
+              profileId: sessionData.profileId,
+              displayName: sessionData.username,
+            } as VisitorProfile);
+            setIsSessionUser(true);
+          }
+          return;
+        }
+      } catch { /* fall through to guest */ }
+      try {
+        const visitorProfile = await ensureVisitorProfile();
         if (isMounted) setProfile(visitorProfile);
-      })
-      .catch(() => {
+      } catch {
         if (isMounted) {
           setStatus({
             type: "error",
             msg: "Unable to load your CoViewer identity. Please refresh and try again.",
           });
         }
-      })
-      .finally(() => {
-        if (isMounted) setIsLoadingProfile(false);
-      });
-
+      }
+    }
+    resolveIdentity().finally(() => {
+      if (isMounted) setIsLoadingProfile(false);
+    });
     return () => {
       isMounted = false;
     };
@@ -107,6 +128,7 @@ export function CommentSection({
         content_id: contentId,
         author_id: activeProfile.profileId,
         author_display_name: activeProfile.displayName,
+        actor_type: isSessionUser ? "human_user" : "human",
         body: cleanBody,
       }),
     });
@@ -146,9 +168,17 @@ export function CommentSection({
           <span className="text-sm font-medium text-slate-700">
             {isLoadingProfile
               ? "Loading identity..."
-              : `Commenting as ${profile?.displayName ?? "Unknown visitor"}`}
+              : isSessionUser
+                ? `Commenting as @${profile?.displayName ?? "User"} (Signed In)`
+                : `Commenting as ${profile?.displayName ?? "Unknown visitor"}`}
           </span>
-          {actorBadge("human")}
+          {isSessionUser ? (
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+              Human User
+            </span>
+          ) : (
+            actorBadge("human")
+          )}
         </div>
 
         <textarea
@@ -203,10 +233,25 @@ export function CommentSection({
                 {humanComments.map((comment) => (
                   <article key={comment.id} className="rounded-xl border bg-white p-4 shadow-sm">
                     <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-semibold text-slate-800">
-                        {comment.author_display_name}
-                      </span>
-                      {actorBadge(comment.actor_type)}
+                      {comment.author_username ? (
+                        <Link
+                          href={`/users/${comment.author_username}`}
+                          className="text-sm font-semibold text-blue-700 hover:text-blue-900 transition-colors"
+                        >
+                          {comment.author_display_name}
+                        </Link>
+                      ) : (
+                        <span className="text-sm font-semibold text-slate-800">
+                          {comment.author_display_name}
+                        </span>
+                      )}
+                      {comment.author_username ? (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                          Human User
+                        </span>
+                      ) : (
+                        actorBadge(comment.actor_type)
+                      )}
                       <span className="text-xs text-slate-400">{comment.created_at}</span>
                     </div>
                     <p className="whitespace-pre-wrap text-sm leading-6 text-slate-600">
