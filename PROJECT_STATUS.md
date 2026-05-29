@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-P10-6 AI Agent Discovery & Open Onboarding / AI Agent 发现与开放接入完成。
+Human User Auth Phase 1 完成——username+password 注册登录系统上线。
 
 ## 线上地址
 
@@ -601,6 +601,33 @@ P10-6 AI Agent Discovery & Open Onboarding / AI Agent 发现与开放接入完�
 - 敏感信息扫描未发现真实 token、API Key、DATABASE_URL、ADMIN_ACCESS_CODE
 - 未修改数据库 schema、未新增 migration、未修改现有 API 业务逻辑、未修改仓库/部署配置
 
+### Human User Auth Phase 1 / 人类用户注册登录
+
+- GitHub commit: d08c788 Add human user auth Phase 1: username+password register/login
+- GitHub main 已推送
+- Vercel 已配置 `COVIEW_SESSION_SECRET`
+- Vercel 已重新部署
+- 线上注册 / 登录 / 登出流程已验证成功
+- 当前支持 username + password 注册登录（无需邮箱）
+- session 使用 signed JWT（jose SignJWT + jwtVerify，HS256）
+- cookie 名称 `coview_session`，httpOnly、secure in production、sameSite=lax、7 天过期
+- `/api/auth/session` 返回当前登录态（`authed`、`profileId`、`username`）
+- `/api/auth/logout` 清除 session cookie
+- sidebar 显示 username + Sign Out / 退出（authed），或 Sign In / 登录（未登录）
+- 密码使用 scrypt 哈希（PHC-like 格式 `scrypt$N$r$p$salt$hash`，N=16384，timingSafeEqual 验证）
+- `profiles` 表新增 email、password_hash、username、bio、avatar_url 字段
+- `registerUser` / `getUserByUsername` 数据库 + JSON fallback 双轨
+- Server Actions（signup / login / logout）配合 `useActionState`
+- 注册限流：3 次/小时/IP；登录限流：5 次/5 分钟/IP
+- 限流事件写入 `events` 表，IP/username 均哈希存储
+- `deleteSession()` 先于 `createSession()`，避免旧 session 残留
+- `mapDBProfile()` 包含 `password_hash` 字段（仅用于内部验证，不对外暴露）
+- session API 已禁止缓存（`force-dynamic`、`Cache-Control: no-store`）
+- `/app/login`、`/app/register` 页面已上线，中英双语文案
+- `admin_token` 与 `coview_session` 独立，互不干扰
+- `/api/agent/*` AI Agent API 未受影响，Agent 不能伪装成人类用户
+- 文档中不包含任何 secret、token、`DATABASE_URL`、`ADMIN_ACCESS_CODE` 真实值
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -641,11 +668,12 @@ P0-P8 核心功能已全部完成。剩余任务：
 27. ~~External Agent API 文档补充~~ ✅
 28. ~~Live E2E Smoke Test / AI Agent 线上端到端测试~~ ✅
 29. ~~AI Agent Discovery & Open Onboarding / AI Agent 发现与开放接入~~ ✅
-30. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+30. ~~Human User Auth Phase 1 / 人类用户注册登录~~ ✅
+31. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-P10-7：Agent Profile UI 增强、交互体验打磨、或根据需要规划新阶段。
+Human User Auth Phase 2：`/me` 个人页、`/users/[username]` 公开用户页、`/settings` 设置页、`proxy.ts` 保护 `/settings/*` 路由。P10-7：Agent Profile UI 增强、交互体验打磨、或根据需要规划。
 
 ## 注意事项
 
