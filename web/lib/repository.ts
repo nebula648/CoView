@@ -1288,6 +1288,77 @@ export async function trackView(params: {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Site-level AI visit tracking (non-content endpoints)                 */
+/* ------------------------------------------------------------------ */
+
+export async function trackSiteLevelAiVisit(params: {
+  path: string;
+  actorType: string;
+  botFamily: string;
+  userAgent: string | null;
+  ip: string;
+}): Promise<void> {
+  const { path, actorType, botFamily, userAgent, ip } = params;
+  const uaHash = userAgent ? hashUA(userAgent) : null;
+  const ipHashVal = hashIP(ip);
+
+  const db = getDB();
+  if (db) {
+    try {
+      const since = new Date(Date.now() - 60 * 60 * 1000);
+      const existing = await db
+        .select()
+        .from(schema.events)
+        .where(
+          and(
+            eq(schema.events.eventType, "ai_site_visit"),
+            eq(schema.events.routeAccessed, path),
+            eq(schema.events.ipHash, ipHashVal),
+            gte(schema.events.createdAt, since),
+          ),
+        )
+        .limit(1);
+
+      if (existing.length > 0) return;
+
+      await db.insert(schema.events).values({
+        contentId: null,
+        eventType: "ai_site_visit",
+        actorType,
+        userAgentRaw: userAgent,
+        userAgentHash: uaHash,
+        ipHash: ipHashVal,
+        routeAccessed: path,
+        extraFields: { bot_family: botFamily },
+      });
+      return;
+    } catch {
+      /* fire-and-forget: failure must not affect the response */
+    }
+  }
+
+  /* JSON fallback: lightweight — just append, no dedup */
+  try {
+    const events = readEvents();
+    events.push({
+      event_id: `evt-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      content_id: null,
+      event_type: "ai_site_visit",
+      actor_type: actorType,
+      user_agent_raw: userAgent,
+      user_agent_hash: uaHash,
+      ip_hash: ipHashVal,
+      route_accessed: path,
+      bot_family: botFamily,
+      timestamp: new Date().toISOString(),
+    });
+    writeEvents(events);
+  } catch {
+    /* fire-and-forget */
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /*  DB fallback helper                                                   */
 /* ------------------------------------------------------------------ */
 

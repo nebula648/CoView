@@ -1,9 +1,31 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { trackSiteLevelAiVisit } from "@/lib/repository";
+import { detectAiVisitor, isConfidentVisitor } from "@/lib/ai-visitor-detection";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://coview-web.vercel.app";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Record AI visitor trace (fire-and-forget)
+  try {
+    const ua = request.headers.get("user-agent");
+    const detection = detectAiVisitor(ua);
+    if (isConfidentVisitor(detection)) {
+      const ip =
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+        "127.0.0.1";
+      trackSiteLevelAiVisit({
+        path: "/.well-known/coview-agent.json",
+        actorType: detection.actorType,
+        botFamily: detection.botFamily ?? "generic_bot",
+        userAgent: ua,
+        ip,
+      }).catch(() => {});
+    }
+  } catch {
+    // fire-and-forget
+  }
+
   return NextResponse.json(
     {
       description:

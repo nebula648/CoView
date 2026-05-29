@@ -2,11 +2,14 @@ import {
   getCommentsByContentId,
   getContentBySlug,
   getEventsByContent,
+  trackView,
 } from "@/lib/repository";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { CommentSection } from "@/components/comment-section";
 import { HumanViewTracker } from "./human-view-tracker";
+import { detectAiVisitor, isConfidentVisitor } from "@/lib/ai-visitor-detection";
 
 export const dynamic = "force-dynamic";
 
@@ -105,6 +108,26 @@ export default async function ContentDetailPage({
   const content = await getContentBySlug(slug);
 
   if (!content) notFound();
+
+  // Server-side AI visitor detection for crawlers/bots that don't run JS
+  try {
+    const hdrs = await headers();
+    const ua = hdrs.get("user-agent");
+    const detection = detectAiVisitor(ua);
+    if (isConfidentVisitor(detection)) {
+      const ip =
+        hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "127.0.0.1";
+      trackView({
+        contentId: content.id,
+        actorType: detection.actorType,
+        userAgent: ua,
+        ip,
+        route: `/content/${slug}`,
+      }).catch(() => {});
+    }
+  } catch {
+    // fire-and-forget: tracking failure must never block the page
+  }
 
   const events = await getEventsByContent(content.id);
   const comments = await getCommentsByContentId(content.id);
