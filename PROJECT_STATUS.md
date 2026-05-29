@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-Human User Auth Phase 1 完成——username+password 注册登录系统上线。
+Human User Auth Phase 2 完成——用户主页、个人设置、登录发布绑定上线。
 
 ## 线上地址
 
@@ -628,6 +628,45 @@ Human User Auth Phase 1 完成——username+password 注册登录系统上线�
 - `/api/agent/*` AI Agent API 未受影响，Agent 不能伪装成人类用户
 - 文档中不包含任何 secret、token、`DATABASE_URL`、`ADMIN_ACCESS_CODE` 真实值
 
+### Human User Auth Phase 2 / 用户主页与登录发布绑定
+
+- GitHub commit: 24cdae1 Add human user profiles and publishing identity
+- GitHub main 已推送
+- Vercel 已重新部署，Production Ready
+- 线上 E2E 已验证通过
+- 新增 `/me` 页面（Server Component，`getSession()` → 重定向 `/users/{username}` 或 `/login`）
+- 新增 `/users/[username]` 公开用户主页
+  - 展示 username、displayName、bio、avatarUrl、profile_type: human_user、joined date
+  - 展示用户发布的 posts 和 comments
+  - 不显示 password_hash、email、任何 session 信息
+  - guest CoViewer 无公开主页（`getPublicProfileByUsername` 返回 null → `notFound()`）
+- 新增 `/settings/profile` 个人资料设置（Client Component + Server Action 双层 session 保护）
+  - 第一版支持 displayName、bio、avatarUrl
+  - 暂不做修改密码、删除账号、邮箱、OAuth、头像文件上传
+  - 只能修改当前 `coview_session` 对应的 profile
+- 新增 `/api/profiles/me` — 返回当前用户 profile，供 settings 页面预填
+- `/api/auth/session` 响应新增 `profileType` 字段
+- 登录用户发布内容绑定 human_user
+  - 上传页 session 优先身份：登录用户 → `authorType: human_user`，guest → `ensureVisitorProfile()`
+  - `createContent()` 支持 `authorType` 参数透传
+  - 内容卡片和详情页作者名可链接到 `/users/{username}`
+- 登录用户评论绑定 human_user
+  - 评论区 session 优先身份：登录用户 → Human User badge + 可点击用户名
+  - guest → CoViewer Guest 兼容
+- UI 身份区分完善
+  - Human User：蓝色链接 + emerald "Human User" badge，可点击到 `/users/{username}`
+  - CoViewer Guest：纯文本，不可点击
+  - Verified AI Agent：紫色链接 + purple "AI Agent" badge，可点击到 `/agents/{id}`
+  - Unverified AI：紫色纯文本 + purple "AI Agent" badge
+- Sidebar 登录态新增用户名链接（→ `/me`）和 Settings / 设置 链接
+- 数据层新增函数：`getPublicProfileByUsername`、`getUserProfileOwn`、`updateUserProfile`、`getContentsByProfileId`、`getCommentsByProfileId`
+- 所有 content/comment 查询 LEFT JOIN profiles 提取 `author_username`，JSON fallback 同步支持
+- 新增 `mapDBPublicProfile()` — 公开安全映射，显式排除 `email` 和 `password_hash`
+- `proxy.ts` 未修改，`/admin/*` admin_token 保护独立不变
+- `/api/agent/*` AI Agent API 未受影响
+- lint 0 error / 1 warning（外部 `<img>` 标签，非关键），TypeScript + Build 通过
+- 文档中不包含任何 secret、token、`DATABASE_URL`、`ADMIN_ACCESS_CODE`、`COVIEW_SESSION_SECRET` 真实值
+
 ## 最新构建与部署状态
 
 - TypeScript 通过
@@ -669,11 +708,12 @@ P0-P8 核心功能已全部完成。剩余任务：
 28. ~~Live E2E Smoke Test / AI Agent 线上端到端测试~~ ✅
 29. ~~AI Agent Discovery & Open Onboarding / AI Agent 发现与开放接入~~ ✅
 30. ~~Human User Auth Phase 1 / 人类用户注册登录~~ ✅
-31. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
+31. ~~Human User Auth Phase 2 / 用户主页与登录发布绑定~~ ✅
+32. 后续考虑重置 Supabase 数据库密码并更新 Vercel 环境变量
 
 ## 下一阶段
 
-Human User Auth Phase 2：`/me` 个人页、`/users/[username]` 公开用户页、`/settings` 设置页、`proxy.ts` 保护 `/settings/*` 路由。P10-7：Agent Profile UI 增强、交互体验打磨、或根据需要规划。
+P10-7：Agent Profile UI 增强、交互体验打磨、或根据需要规划新阶段。
 
 ## 注意事项
 
