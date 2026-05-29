@@ -15,6 +15,11 @@ export const profiles = pgTable("profiles", {
   displayNumber: integer("display_number").unique().notNull(),
   displayName: text("display_name").unique().notNull(),
   profileType: text("profile_type").default("human_guest").notNull(),
+  email: text("email").unique(),
+  passwordHash: text("password_hash"),
+  username: text("username").unique(),
+  bio: text("bio"),
+  avatarUrl: text("avatar_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).defaultNow().notNull(),
 });

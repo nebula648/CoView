@@ -459,6 +459,178 @@ export async function createProfile(): Promise<{
   return profile;
 }
 
+export async function getUserByEmail(email: string): Promise<any | null> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.profiles)
+        .where(eq(schema.profiles.email, email.toLowerCase().trim()))
+        .limit(1);
+      return rows.length > 0 ? mapDBProfile(rows[0]) : null;
+    },
+    () => {
+      const profiles = readProfiles();
+      return profiles.find(
+        (p: any) => p.email === email.toLowerCase().trim(),
+      ) ?? null;
+    },
+  );
+}
+
+export async function getUserByUsername(username: string): Promise<any | null> {
+  return tryDB(
+    async (db) => {
+      const rows = await db
+        .select()
+        .from(schema.profiles)
+        .where(eq(schema.profiles.username, username.toLowerCase().trim()))
+        .limit(1);
+      return rows.length > 0 ? mapDBProfile(rows[0]) : null;
+    },
+    () => {
+      const profiles = readProfiles();
+      return profiles.find(
+        (p: any) => p.username === username.toLowerCase().trim(),
+      ) ?? null;
+    },
+  );
+}
+
+export async function registerUser(params: {
+  username: string;
+  displayName: string;
+  passwordHash: string;
+  email?: string;
+}): Promise<any> {
+  const db = getDB();
+  if (db) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const maxRows = await db
+          .select({
+            maxDisplayNumber: sql<number>`coalesce(max(${schema.profiles.displayNumber}), 0)`,
+          })
+          .from(schema.profiles);
+        const displayNumber = Number(maxRows[0]?.maxDisplayNumber ?? 0) + 1;
+        const inserted = await db
+          .insert(schema.profiles)
+          .values({
+            displayNumber,
+            displayName: params.displayName,
+            email: params.email?.toLowerCase().trim() ?? null,
+            username: params.username.toLowerCase().trim(),
+            passwordHash: params.passwordHash,
+            profileType: "human_user",
+          })
+          .returning();
+        return mapDBProfile(inserted[0]);
+      } catch {
+        // Retry on display_number collision
+      }
+    }
+    throw new Error("Failed to register user after retries");
+  }
+
+  // JSON fallback
+  const profiles = readProfiles();
+  if (profiles.some((p: any) => p.username === params.username.toLowerCase().trim())) {
+    throw new Error("Username already taken");
+  }
+  const displayNumber =
+    profiles.reduce((max: number, p: any) => Math.max(max, p.display_number ?? 0), 0) + 1;
+  const now = new Date().toISOString();
+  const profile = {
+    id: crypto.randomUUID(),
+    display_number: displayNumber,
+    display_name: params.displayName,
+    profile_type: "human_user",
+    email: params.email?.toLowerCase().trim() ?? null,
+    username: params.username.toLowerCase().trim(),
+    password_hash: params.passwordHash,
+    bio: null,
+    avatar_url: null,
+    created_at: now,
+    last_seen_at: now,
+  };
+  profiles.push(profile);
+  writeProfiles(profiles);
+  return profile;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Rate limit helpers                                                   */
+/* ------------------------------------------------------------------ */
+
+export async function countRecentEvents(params: {
+  eventType: string;
+  ipHash: string;
+  sinceMs: number;
+}): Promise<number> {
+  return tryDB(
+    async (db) => {
+      const since = new Date(Date.now() - params.sinceMs);
+      const rows = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(schema.events)
+        .where(
+          and(
+            eq(schema.events.eventType, params.eventType),
+            eq(schema.events.ipHash, params.ipHash),
+            gte(schema.events.createdAt, since),
+          ),
+        );
+      return rows[0]?.count ?? 0;
+    },
+    () => {
+      const events = readEvents();
+      const since = new Date(Date.now() - params.sinceMs);
+      return events.filter(
+        (e: any) =>
+          e.event_type === params.eventType &&
+          e.ip_hash === params.ipHash &&
+          new Date(e.created_at) >= since,
+      ).length;
+    },
+  );
+}
+
+export async function recordRateLimitEvent(params: {
+  eventType: string;
+  ipHash: string;
+  extraFields?: Record<string, unknown>;
+}): Promise<void> {
+  const db = getDB();
+  if (db) {
+    try {
+      await db.insert(schema.events).values({
+        contentId: null,
+        eventType: params.eventType,
+        actorType: "human",
+        ipHash: params.ipHash,
+        extraFields: params.extraFields ?? {},
+      });
+    } catch { /* best-effort */ }
+    return;
+  }
+  // JSON fallback
+  const events = readEvents();
+  events.push({
+    id: crypto.randomUUID(),
+    event_type: params.eventType,
+    actor_type: "human",
+    ip_hash: params.ipHash,
+    content_id: null,
+    user_agent_raw: null,
+    user_agent_hash: null,
+    session_id: null,
+    route_accessed: null,
+    extra_fields: params.extraFields ?? {},
+    created_at: new Date().toISOString(),
+  });
+  writeEvents(events);
+}
+
 /* ------------------------------------------------------------------ */
 /*  Content CRUD                                                        */
 /* ------------------------------------------------------------------ */
@@ -1469,6 +1641,11 @@ function mapDBProfile(row: any): any {
     display_number: row.displayNumber,
     display_name: row.displayName,
     profile_type: row.profileType,
+    email: row.email ?? null,
+    username: row.username ?? null,
+    password_hash: row.passwordHash ?? null,
+    bio: row.bio ?? null,
+    avatar_url: row.avatarUrl ?? null,
     created_at: row.createdAt
       ? new Date(row.createdAt).toISOString()
       : "",
